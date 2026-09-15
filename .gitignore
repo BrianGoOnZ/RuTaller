@@ -1,0 +1,25 @@
+node_modules/
+dist/
+dist-electron/
+release/
+build/
+
+# Env files
+.env
+!.env.example
+
+# Base de datos local (nunca se versiona)
+database/*.sqlite
+database/*.sqlite3
+
+# Logs
+npm-debug.log*
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
