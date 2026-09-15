@@ -4,8 +4,10 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Clientes from './pages/Clientes';
+import Recepcion from './pages/Recepcion';
 import Servicios from './pages/Servicios';
-import Ingresos from './pages/Ingresos';
+import Inventario from './pages/Inventario';
+import Finanzas from './pages/Finanzas';
 
 export default function App() {
   return (
@@ -21,8 +23,10 @@ export default function App() {
         >
           <Route path="/" element={<Dashboard />} />
           <Route path="/clientes" element={<Clientes />} />
+          <Route path="/recepcion" element={<Recepcion />} />
           <Route path="/servicios" element={<Servicios />} />
-          <Route path="/ingresos" element={<Ingresos />} />
+          <Route path="/inventario" element={<Inventario />} />
+          <Route path="/finanzas" element={<Finanzas />} />
         </Route>
       </Routes>
     </HashRouter>
