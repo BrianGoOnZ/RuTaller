@@ -1,4 +1,5 @@
 const { Moto, Cliente, OrdenServicio } = require('../models');
+const { eliminarOrdenCompleta } = require('./ordenServicioController');
 
 async function list(req, res, next) {
   try {
@@ -53,6 +54,12 @@ async function remove(req, res, next) {
   try {
     const moto = await Moto.findByPk(req.params.id);
     if (!moto) return res.status(404).json({ message: 'Moto no encontrada' });
+
+    const ordenes = await OrdenServicio.findAll({ where: { motoId: moto.id } });
+    for (const orden of ordenes) {
+      await eliminarOrdenCompleta(orden.id);
+    }
+
     await moto.destroy();
     res.status(204).end();
   } catch (err) {

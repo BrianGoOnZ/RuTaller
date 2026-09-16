@@ -21,6 +21,7 @@ router.get('/', controller.list);
 router.get('/:id', controller.getOne);
 router.post('/', controller.create);
 router.put('/:id', controller.update);
+router.delete('/:id', controller.remove);
 
 router.post('/:id/items', controller.agregarItem);
 router.delete('/:id/items/:itemId', controller.eliminarItem);

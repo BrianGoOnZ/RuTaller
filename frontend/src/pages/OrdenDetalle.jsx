@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   getOrden,
   updateOrden,
+  deleteOrden,
   agregarItem,
   eliminarItem,
   subirFoto,
@@ -113,6 +114,12 @@ export default function OrdenDetalle() {
     cargar();
   }
 
+  async function handleEliminarOrden() {
+    if (!confirm(`Eliminar por completo la orden #${orden.id}? Esto no se puede deshacer.`)) return;
+    await deleteOrden(id);
+    navigate('/servicios');
+  }
+
   async function guardarEntrega() {
     setErrorEntrega('');
     if (!fechaEntregaReal) {
@@ -151,17 +158,27 @@ export default function OrdenDetalle() {
               {orden.Moto?.Cliente?.nombre} · Placas: {orden.Moto?.placas || 'N/A'}
             </p>
           </div>
-          <select
-            className={`${inputClass} w-56`}
-            value={orden.estado}
-            onChange={(e) => cambiarEstado(e.target.value)}
-          >
-            {ESTADOS_ORDEN.map((es) => (
-              <option key={es.value} value={es.value}>
-                {es.label}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            <select
+              className={`${inputClass} w-56`}
+              value={orden.estado}
+              onChange={(e) => cambiarEstado(e.target.value)}
+            >
+              {ESTADOS_ORDEN.map((es) => (
+                <option key={es.value} value={es.value}>
+                  {es.label}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={handleEliminarOrden}
+              className="text-sm text-red-500 hover:text-red-700"
+              title="Eliminar esta orden por completo"
+            >
+              Eliminar
+            </button>
+          </div>
         </div>
         {orden.enGarantia && orden.ordenGarantiaOriginal && (
           <p className="text-sm text-amber-700 mt-2">

@@ -4,7 +4,8 @@ const { Producto } = require('../models');
 async function list(req, res, next) {
   try {
     const { q } = req.query;
-    const where = q ? { nombre: { [Op.like]: `%${q}%` } } : undefined;
+    const where = { activo: true };
+    if (q) where.nombre = { [Op.like]: `%${q}%` };
     const productos = await Producto.findAll({ where, order: [['nombre', 'ASC']] });
     res.json(productos);
   } catch (err) {

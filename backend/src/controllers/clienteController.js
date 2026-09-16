@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
-const { Cliente, Moto } = require('../models');
+const { Cliente, Moto, OrdenServicio } = require('../models');
+const { eliminarOrdenCompleta } = require('./ordenServicioController');
 
 async function list(req, res, next) {
   try {
@@ -54,6 +55,16 @@ async function remove(req, res, next) {
   try {
     const cliente = await Cliente.findByPk(req.params.id);
     if (!cliente) return res.status(404).json({ message: 'Cliente no encontrado' });
+
+    const motos = await Moto.findAll({ where: { clienteId: cliente.id } });
+    for (const moto of motos) {
+      const ordenes = await OrdenServicio.findAll({ where: { motoId: moto.id } });
+      for (const orden of ordenes) {
+        await eliminarOrdenCompleta(orden.id);
+      }
+      await moto.destroy();
+    }
+
     await cliente.destroy();
     res.status(204).end();
   } catch (err) {

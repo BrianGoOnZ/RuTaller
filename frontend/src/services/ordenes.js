@@ -4,6 +4,7 @@ export const listOrdenes = (params) => api.get('/ordenes', { params }).then((r) 
 export const getOrden = (id) => api.get(`/ordenes/${id}`).then((r) => r.data);
 export const createOrden = (data) => api.post('/ordenes', data).then((r) => r.data);
 export const updateOrden = (id, data) => api.put(`/ordenes/${id}`, data).then((r) => r.data);
+export const deleteOrden = (id) => api.delete(`/ordenes/${id}`);
 export const agregarItem = (id, data) => api.post(`/ordenes/${id}/items`, data).then((r) => r.data);
 export const eliminarItem = (id, itemId) =>
   api.delete(`/ordenes/${id}/items/${itemId}`).then((r) => r.data);

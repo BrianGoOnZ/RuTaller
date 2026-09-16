@@ -18,6 +18,26 @@ const includeCompleto = [
   { model: OrdenServicio, as: 'ordenGarantiaOriginal' },
 ];
 
+async function eliminarOrdenCompleta(ordenServicioId) {
+  const items = await OrdenServicioItem.findAll({ where: { ordenServicioId } });
+  for (const item of items) {
+    if (item.tipo === 'producto' && item.productoId) {
+      const producto = await Producto.findByPk(item.productoId);
+      if (producto) await producto.update({ stock: producto.stock + item.cantidad });
+    }
+  }
+
+  await OrdenServicio.update(
+    { ordenGarantiaOriginalId: null },
+    { where: { ordenGarantiaOriginalId: ordenServicioId } }
+  );
+
+  await OrdenServicioItem.destroy({ where: { ordenServicioId } });
+  await OrdenServicioChecklistItem.destroy({ where: { ordenServicioId } });
+  await OrdenServicioFoto.destroy({ where: { ordenServicioId } });
+  await OrdenServicio.destroy({ where: { id: ordenServicioId } });
+}
+
 async function recalcularTotales(ordenServicioId) {
   const items = await OrdenServicioItem.findAll({ where: { ordenServicioId } });
   const subtotal = items.reduce((acc, item) => acc + Number(item.importe), 0);
@@ -263,13 +283,26 @@ async function eliminarFoto(req, res, next) {
   }
 }
 
+async function remove(req, res, next) {
+  try {
+    const orden = await OrdenServicio.findByPk(req.params.id);
+    if (!orden) return res.status(404).json({ message: 'Orden no encontrada' });
+    await eliminarOrdenCompleta(orden.id);
+    res.status(204).end();
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   list,
   getOne,
   create,
   update,
+  remove,
   agregarItem,
   eliminarItem,
   agregarFoto,
   eliminarFoto,
+  eliminarOrdenCompleta,
 };
