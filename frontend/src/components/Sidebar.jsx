@@ -1,5 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useConfigStore } from '../store/configStore';
+
+function iniciales(nombre) {
+  const palabras = nombre.trim().split(/\s+/).filter(Boolean);
+  if (palabras.length === 0) return 'RT';
+  if (palabras.length === 1) return palabras[0].slice(0, 2).toUpperCase();
+  return (palabras[0][0] + palabras[1][0]).toUpperCase();
+}
 
 const iconProps = {
   width: 20,
@@ -98,6 +106,12 @@ const links = [
 
 export default function Sidebar() {
   const [expandido, setExpandido] = useState(false);
+  const nombreTaller = useConfigStore((s) => s.nombreTaller);
+  const cargar = useConfigStore((s) => s.cargar);
+
+  useEffect(() => {
+    cargar();
+  }, [cargar]);
 
   return (
     <aside
@@ -107,8 +121,13 @@ export default function Sidebar() {
         expandido ? 'w-56' : 'w-16'
       }`}
     >
-      <div className="h-14 flex items-center justify-center border-b border-slate-800 shrink-0">
-        <span className="text-xl font-bold">{expandido ? 'RuTaller' : 'RT'}</span>
+      <div className="h-14 flex items-center justify-center border-b border-slate-800 shrink-0 px-3">
+        <span
+          className={`font-bold ${expandido ? 'w-full truncate text-center text-lg' : 'text-xl'}`}
+          title={nombreTaller}
+        >
+          {expandido ? nombreTaller : iniciales(nombreTaller)}
+        </span>
       </div>
       <nav className="flex-1 px-2 py-4 space-y-1">
         {links.map((link) => (

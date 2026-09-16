@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { getConfiguracion, updateConfiguracion } from '../services/configuracion';
+import { useConfigStore } from '../store/configStore';
 import { inputClass, labelClass, cardClass, btnPrimary } from '../ui/styles';
 
 export default function Configuracion() {
   const [form, setForm] = useState(null);
   const [guardando, setGuardando] = useState(false);
   const [mensaje, setMensaje] = useState('');
+  const setNombreTaller = useConfigStore((s) => s.setNombreTaller);
 
   useEffect(() => {
     getConfiguracion().then(setForm);
@@ -22,6 +24,7 @@ export default function Configuracion() {
     try {
       const actualizado = await updateConfiguracion(form);
       setForm(actualizado);
+      setNombreTaller(actualizado.nombreTaller);
       setMensaje('Datos guardados');
     } finally {
       setGuardando(false);
