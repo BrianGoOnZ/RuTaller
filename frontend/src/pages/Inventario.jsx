@@ -2,11 +2,13 @@ import { useState } from 'react';
 import ProductosTab from '../components/inventario/ProductosTab';
 import InsumosTab from '../components/inventario/InsumosTab';
 import VentaRapidaTab from '../components/inventario/VentaRapidaTab';
+import MecanicosTab from '../components/inventario/MecanicosTab';
 
 const TABS = [
   { id: 'productos', label: 'Productos' },
   { id: 'insumos', label: 'Insumos' },
   { id: 'venta', label: 'Venta rapida' },
+  { id: 'mecanicos', label: 'Mecanicos' },
 ];
 
 export default function Inventario() {
@@ -33,6 +35,7 @@ export default function Inventario() {
       {tab === 'productos' && <ProductosTab />}
       {tab === 'insumos' && <InsumosTab />}
       {tab === 'venta' && <VentaRapidaTab />}
+      {tab === 'mecanicos' && <MecanicosTab />}
     </div>
   );
 }
