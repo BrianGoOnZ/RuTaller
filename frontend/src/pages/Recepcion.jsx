@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { listClientes, createCliente } from '../services/clientes';
 import { listMotos, createMoto, TIPOS_MOTO } from '../services/motos';
-import { createOrden, getOrden, listOrdenes, subirFoto, CHECKLIST_ITEMS } from '../services/ordenes';
+import { createOrden, subirFoto, CHECKLIST_ITEMS } from '../services/ordenes';
 import SearchSelect from '../components/SearchSelect';
 import NivelSlider from '../components/NivelSlider';
 
@@ -41,10 +41,6 @@ export default function Recepcion() {
   const [nivelAceite, setNivelAceite] = useState('1/2');
   const [trabajoSolicitado, setTrabajoSolicitado] = useState('');
 
-  const [enGarantia, setEnGarantia] = useState(false);
-  const [ordenGarantia, setOrdenGarantia] = useState(null);
-  const [cargandoGarantia, setCargandoGarantia] = useState(false);
-
   const [firmaClienteRecepcion, setFirmaClienteRecepcion] = useState(false);
   const [fotos, setFotos] = useState([]);
 
@@ -58,33 +54,6 @@ export default function Recepcion() {
     setMotoNueva(null);
     const data = await listMotos(c.id);
     setMotos(data);
-  }
-
-  async function seleccionarOrdenGarantia(resumen) {
-    setCargandoGarantia(true);
-    try {
-      const completa = await getOrden(resumen.id);
-      setOrdenGarantia(completa);
-
-      setClienteNuevo(null);
-      setCliente(completa.Moto.Cliente);
-      setMotoNueva(null);
-      setMoto(completa.Moto);
-      setMotos(await listMotos(completa.Moto.clienteId));
-
-      setKilometraje(completa.kilometraje || '');
-      setNivelGasolina(completa.nivelGasolina || '1/2');
-      setNivelAceite(completa.nivelAceite || '1/2');
-      setTrabajoSolicitado(completa.trabajoSolicitado || '');
-      setChecklist(
-        CHECKLIST_ITEMS.map((nombre) => {
-          const previo = completa.OrdenServicioChecklistItems?.find((c) => c.nombre === nombre);
-          return { nombre, estado: previo?.estado || null, nota: previo?.nota || '' };
-        })
-      );
-    } finally {
-      setCargandoGarantia(false);
-    }
   }
 
   function confirmarClienteNuevo() {
@@ -142,8 +111,6 @@ export default function Recepcion() {
         nivelGasolina,
         nivelAceite,
         trabajoSolicitado,
-        enGarantia,
-        ordenGarantiaOriginalId: enGarantia ? ordenGarantia?.id : null,
         firmaClienteRecepcion,
         checklist,
       });
@@ -167,63 +134,13 @@ export default function Recepcion() {
         <p className="text-slate-500">Registra el ingreso de una moto al taller.</p>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+        Si una moto ya entregada regresa por el mismo problema (garantia), no registres una
+        recepcion nueva aqui: ve a <span className="font-medium">Servicios</span>, abre esa orden y
+        cambia su estado a "Reabierta por garantia".
+      </p>
 
-      {/* Garantia */}
-      <section className={cardClass}>
-        <label className="flex items-center gap-2 font-semibold text-slate-700">
-          <input
-            type="checkbox"
-            checked={enGarantia}
-            onChange={(e) => {
-              setEnGarantia(e.target.checked);
-              if (!e.target.checked) setOrdenGarantia(null);
-            }}
-          />
-          Entra por garantia (reingreso de una moto ya atendida)
-        </label>
-        {enGarantia && (
-          <div className="space-y-2">
-            {ordenGarantia ? (
-              <div className="flex items-center justify-between bg-slate-50 rounded-md px-3 py-2">
-                <span className="text-sm">
-                  Orden #{ordenGarantia.id} - {ordenGarantia.Moto?.placas} -{' '}
-                  {ordenGarantia.trabajoSolicitado}
-                </span>
-                <button
-                  type="button"
-                  className="text-sm text-slate-500 hover:underline"
-                  onClick={() => setOrdenGarantia(null)}
-                >
-                  Cambiar
-                </button>
-              </div>
-            ) : (
-              <>
-                <p className="text-xs text-slate-400">
-                  Busca la orden original: al seleccionarla se rellenan solos el cliente, la moto, el
-                  checklist, los niveles, el kilometraje y el trabajo solicitado con los datos de esa
-                  visita - solo ajusta lo que haya cambiado.
-                </p>
-                <SearchSelect
-                  placeholder="Buscar orden original por folio, placas o cliente..."
-                  onSearch={(q) => listOrdenes({ q })}
-                  renderItem={(o) => (
-                    <>
-                      <p className="font-medium">
-                        #{o.id} - {o.Moto?.placas} - {o.Moto?.Cliente?.nombre}
-                      </p>
-                      <p className="text-xs text-slate-500">{o.trabajoSolicitado}</p>
-                    </>
-                  )}
-                  onSelect={seleccionarOrdenGarantia}
-                />
-                {cargandoGarantia && <p className="text-xs text-slate-400">Cargando datos de la orden...</p>}
-              </>
-            )}
-          </div>
-        )}
-      </section>
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       {/* Cliente */}
       <section className={cardClass}>
@@ -243,7 +160,6 @@ export default function Recepcion() {
                 setMoto(null);
                 setMotoNueva(null);
                 setMotos([]);
-                setOrdenGarantia(null);
               }}
             >
               Cambiar
@@ -318,7 +234,6 @@ export default function Recepcion() {
                 onClick={() => {
                   setMoto(null);
                   setMotoNueva(null);
-                  setOrdenGarantia(null);
                 }}
               >
                 Cambiar

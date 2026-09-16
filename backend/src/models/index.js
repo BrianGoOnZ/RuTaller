@@ -51,7 +51,7 @@ VentaItem.belongsTo(Producto, { foreignKey: 'productoId' });
 Gasto.belongsTo(Insumo, { foreignKey: 'insumoId' });
 
 async function syncDatabase() {
-  await sequelize.sync();
+  await sequelize.sync({ alter: true });
 
   const existingConfig = await Configuracion.findByPk(1);
   if (!existingConfig) {

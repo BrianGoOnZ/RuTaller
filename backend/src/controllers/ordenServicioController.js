@@ -157,8 +157,17 @@ async function update(req, res, next) {
       'estado',
       'firmaClienteRecepcion',
       'firmaClienteEntrega',
+      'fechaReingresoGarantia',
+      'diagnosticoGarantia',
+      'fechaEntregaGarantia',
+      'firmaClienteEntregaGarantia',
     ];
-    const camposFecha = ['fechaEntregaEstimada', 'fechaEntregaReal'];
+    const camposFecha = [
+      'fechaEntregaEstimada',
+      'fechaEntregaReal',
+      'fechaReingresoGarantia',
+      'fechaEntregaGarantia',
+    ];
     const cambios = {};
     camposPermitidos.forEach((campo) => {
       if (req.body[campo] === undefined) return;

@@ -43,6 +43,13 @@ const OrdenServicio = sequelize.define('OrdenServicio', {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  fechaReingresoGarantia: DataTypes.DATEONLY,
+  diagnosticoGarantia: DataTypes.TEXT,
+  fechaEntregaGarantia: DataTypes.DATEONLY,
+  firmaClienteEntregaGarantia: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
   subtotal: {
     type: DataTypes.DECIMAL(10, 2),
     defaultValue: 0,

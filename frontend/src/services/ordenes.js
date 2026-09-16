@@ -51,5 +51,6 @@ export const ESTADOS_ORDEN = [
   { value: 'reparacion', label: 'En reparacion' },
   { value: 'lista', label: 'Lista para entrega' },
   { value: 'entregada', label: 'Entregada' },
+  { value: 'garantia', label: 'Reabierta por garantia' },
   { value: 'cancelada', label: 'Cancelada' },
 ];

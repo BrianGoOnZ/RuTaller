@@ -24,6 +24,6 @@ const CHECKLIST_ITEMS = [
 
 const NIVELES = ['vacio', '1/4', '1/2', '3/4', 'lleno'];
 
-const ESTADOS_ORDEN = ['recibida', 'diagnostico', 'reparacion', 'lista', 'entregada', 'cancelada'];
+const ESTADOS_ORDEN = ['recibida', 'diagnostico', 'reparacion', 'lista', 'entregada', 'garantia', 'cancelada'];
 
 module.exports = { CHECKLIST_ITEMS, NIVELES, ESTADOS_ORDEN };
