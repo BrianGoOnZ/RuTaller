@@ -5,7 +5,7 @@ import { listMotos, createMoto, TIPOS_MOTO } from '../services/motos';
 import { createOrden, subirFoto, CHECKLIST_ITEMS } from '../services/ordenes';
 import SearchSelect from '../components/SearchSelect';
 import NivelSlider from '../components/NivelSlider';
-import { inputClass, labelClass, btnGhost, btnPrimarySmall, btnPrimary } from '../ui/styles';
+import { inputClass, labelClass, btnGhost, btnPrimarySmall, btnPrimary, numberBadgeClass } from '../ui/styles';
 
 function Seccion({ numero, titulo, full, children }) {
   return (
@@ -13,9 +13,7 @@ function Seccion({ numero, titulo, full, children }) {
       className={`space-y-4 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-100 ${full ? 'lg:col-span-2' : ''}`}
     >
       <div className="flex items-center gap-3">
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">
-          {numero}
-        </span>
+        <span className={numberBadgeClass}>{numero}</span>
         <h2 className="text-base font-semibold text-slate-800">{titulo}</h2>
       </div>
       {children}

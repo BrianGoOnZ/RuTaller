@@ -32,7 +32,7 @@ export default function Login() {
         className="w-80 space-y-4 rounded-xl bg-white p-8 shadow-lg ring-1 ring-slate-100"
       >
         <div className="text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 text-lg font-bold text-white">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-orange-600 text-lg font-bold text-white">
             RT
           </div>
           <h1 className="text-xl font-bold text-slate-800">RuTaller</h1>

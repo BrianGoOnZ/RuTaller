@@ -118,8 +118,10 @@ export default function Sidebar() {
             end={link.end}
             title={link.label}
             className={({ isActive }) =>
-              `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap ${
-                isActive ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800'
+              `flex items-center gap-3 rounded-md border-l-2 px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
+                isActive
+                  ? 'border-orange-500 bg-slate-800 text-white'
+                  : 'border-transparent text-slate-300 hover:bg-slate-800'
               }`
             }
           >

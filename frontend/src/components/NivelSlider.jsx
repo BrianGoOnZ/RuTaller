@@ -17,7 +17,7 @@ export default function NivelSlider({ label, value, onChange }) {
         step={1}
         value={index}
         onChange={(e) => onChange(NIVELES[Number(e.target.value)])}
-        className="w-full accent-slate-800"
+        className="w-full accent-orange-600"
       />
       <div className="flex justify-between text-xs text-slate-400 mt-1">
         <span>Vacio</span>
