@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   getOrden,
@@ -8,55 +8,28 @@ import {
   eliminarItem,
   subirFoto,
   eliminarFoto,
+  crearGarantiaEvento,
   ESTADOS_ORDEN,
 } from '../services/ordenes';
 import { listProductos, createProducto } from '../services/productos';
 import SearchSelect from '../components/SearchSelect';
+import EstadoAutoGuardado from '../components/EstadoAutoGuardado';
+import GarantiaEventoCard from '../components/GarantiaEventoCard';
+import useAutoSaveTexto from '../hooks/useAutoSaveTexto';
 
 const inputClass = 'w-full border border-slate-300 rounded-md px-3 py-2 text-sm';
 const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
 const cardClass = 'bg-white rounded-lg shadow-sm p-5 space-y-4';
-
-function useAutoSaveTexto(ordenId, campo, valorServidor) {
-  const [valor, setValor] = useState(valorServidor || '');
-  const [estadoGuardado, setEstadoGuardado] = useState('inactivo');
-  const timeoutRef = useRef(null);
-  const ultimoGuardadoRef = useRef(valorServidor || '');
-
-  useEffect(() => {
-    setValor(valorServidor || '');
-    ultimoGuardadoRef.current = valorServidor || '';
-  }, [valorServidor]);
-
-  function onChange(nuevoValor) {
-    setValor(nuevoValor);
-    setEstadoGuardado('escribiendo');
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(async () => {
-      if (nuevoValor === ultimoGuardadoRef.current) return;
-      setEstadoGuardado('guardando');
-      await updateOrden(ordenId, { [campo]: nuevoValor });
-      ultimoGuardadoRef.current = nuevoValor;
-      setEstadoGuardado('guardado');
-    }, 900);
-  }
-
-  return { valor, onChange, estadoGuardado };
-}
-
-function EstadoAutoGuardado({ estado }) {
-  if (estado === 'guardando') return <span className="text-xs text-slate-400">Guardando...</span>;
-  if (estado === 'guardado') return <span className="text-xs text-green-600">Guardado</span>;
-  return null;
-}
 
 export default function OrdenDetalle() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [orden, setOrden] = useState(null);
 
-  const diagnosticoAuto = useAutoSaveTexto(id, 'diagnostico', orden?.diagnostico);
-  const diagnosticoGarantiaAuto = useAutoSaveTexto(id, 'diagnosticoGarantia', orden?.diagnosticoGarantia);
+  const diagnosticoAuto = useAutoSaveTexto(
+    (valor) => updateOrden(id, { diagnostico: valor }).then(() => cargar()),
+    orden?.diagnostico
+  );
 
   const [tipoItem, setTipoItem] = useState('producto');
   const [productoSel, setProductoSel] = useState(null);
@@ -73,18 +46,11 @@ export default function OrdenDetalle() {
   const [errorEntrega, setErrorEntrega] = useState('');
   const [guardandoEntrega, setGuardandoEntrega] = useState(false);
 
-  const [fechaEntregaGarantia, setFechaEntregaGarantia] = useState('');
-  const [firmaClienteEntregaGarantia, setFirmaClienteEntregaGarantia] = useState(false);
-  const [errorEntregaGarantia, setErrorEntregaGarantia] = useState('');
-  const [guardandoEntregaGarantia, setGuardandoEntregaGarantia] = useState(false);
-
   async function cargar() {
     const data = await getOrden(id);
     setOrden(data);
     setFechaEntregaReal(data.fechaEntregaReal || new Date().toISOString().slice(0, 10));
     setFirmaClienteEntrega(data.firmaClienteEntrega);
-    setFechaEntregaGarantia(data.fechaEntregaGarantia || new Date().toISOString().slice(0, 10));
-    setFirmaClienteEntregaGarantia(data.firmaClienteEntregaGarantia);
   }
 
   useEffect(() => {
@@ -92,11 +58,7 @@ export default function OrdenDetalle() {
   }, [id]);
 
   async function cambiarEstado(nuevoEstado) {
-    const cambios = { estado: nuevoEstado };
-    if (nuevoEstado === 'garantia' && !orden.fechaReingresoGarantia) {
-      cambios.fechaReingresoGarantia = new Date().toISOString().slice(0, 10);
-    }
-    await updateOrden(id, cambios);
+    await updateOrden(id, { estado: nuevoEstado });
     cargar();
   }
 
@@ -178,28 +140,15 @@ export default function OrdenDetalle() {
     }
   }
 
-  async function guardarEntregaGarantia() {
-    setErrorEntregaGarantia('');
-    if (!fechaEntregaGarantia) {
-      setErrorEntregaGarantia('Captura la fecha de entrega');
-      return;
-    }
-    setGuardandoEntregaGarantia(true);
-    try {
-      await updateOrden(id, {
-        fechaEntregaGarantia,
-        firmaClienteEntregaGarantia,
-        estado: 'entregada',
-      });
-      await cargar();
-    } catch (err) {
-      setErrorEntregaGarantia(err.response?.data?.message || 'No se pudo marcar como entregada');
-    } finally {
-      setGuardandoEntregaGarantia(false);
-    }
+  async function handleAbrirGarantia() {
+    await crearGarantiaEvento(id, {});
+    cargar();
   }
 
   if (!orden) return <p className="text-slate-500">Cargando...</p>;
+
+  const garantiaAbierta = orden.GarantiaEventos?.some((g) => !g.fechaEntrega);
+  const puedeAbrirGarantia = !!orden.fechaEntregaReal && !garantiaAbierta;
 
   return (
     <div className="max-w-4xl space-y-6 pb-10">
@@ -217,17 +166,23 @@ export default function OrdenDetalle() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <select
-              className={`${inputClass} w-56`}
-              value={orden.estado}
-              onChange={(e) => cambiarEstado(e.target.value)}
-            >
-              {ESTADOS_ORDEN.map((es) => (
-                <option key={es.value} value={es.value}>
-                  {es.label}
-                </option>
-              ))}
-            </select>
+            {orden.estado === 'garantia' ? (
+              <span className="px-3 py-2 text-sm bg-amber-100 text-amber-800 rounded-md w-56 text-center">
+                Reabierta por garantia
+              </span>
+            ) : (
+              <select
+                className={`${inputClass} w-56`}
+                value={orden.estado}
+                onChange={(e) => cambiarEstado(e.target.value)}
+              >
+                {ESTADOS_ORDEN.filter((es) => es.value !== 'garantia').map((es) => (
+                  <option key={es.value} value={es.value}>
+                    {es.label}
+                  </option>
+                ))}
+              </select>
+            )}
             <button
               type="button"
               onClick={handleEliminarOrden}
@@ -238,10 +193,9 @@ export default function OrdenDetalle() {
             </button>
           </div>
         </div>
-        {orden.fechaReingresoGarantia && (
+        {orden.GarantiaEventos?.length > 0 && (
           <p className="text-sm text-amber-700 mt-2">
-            Reabierta por garantia el {orden.fechaReingresoGarantia}
-            {orden.fechaEntregaGarantia && ` · reentregada el ${orden.fechaEntregaGarantia}`}
+            {orden.GarantiaEventos.length} reingreso(s) por garantia registrado(s) (ver abajo)
           </p>
         )}
       </div>
@@ -347,37 +301,9 @@ export default function OrdenDetalle() {
         <p className="text-xs text-slate-400">Se guarda solo mientras escribes.</p>
       </section>
 
-      {/* Diagnostico por garantia */}
-      {orden.fechaReingresoGarantia && (
-        <section className={cardClass}>
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-slate-700">Diagnostico por garantia</h2>
-            <EstadoAutoGuardado estado={diagnosticoGarantiaAuto.estadoGuardado} />
-          </div>
-          <p className="text-xs text-slate-400">Reingreso por garantia: {orden.fechaReingresoGarantia}</p>
-          <div className="bg-slate-50 rounded-md p-3">
-            <p className="text-xs text-slate-400 mb-1">Diagnostico original (primera visita):</p>
-            <p className="text-sm text-slate-600">{orden.diagnostico || 'Sin diagnostico registrado.'}</p>
-          </div>
-          <textarea
-            className={`${inputClass} min-h-24`}
-            placeholder="Que se encontro o se hizo de nuevo en esta visita..."
-            value={diagnosticoGarantiaAuto.valor}
-            onChange={(e) => diagnosticoGarantiaAuto.onChange(e.target.value)}
-          />
-          <p className="text-xs text-slate-400">Se guarda solo mientras escribes.</p>
-        </section>
-      )}
-
       {/* Presupuesto */}
       <section className={cardClass}>
         <h2 className="font-semibold text-slate-700">Presupuesto</h2>
-        {orden.estado === 'garantia' && (
-          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
-            Esta orden esta reabierta por garantia. Lo que ya se cobro abajo se queda igual; si agregas
-            algo nuevo (producto o mano de obra), se suma al total sin duplicar lo anterior.
-          </p>
-        )}
 
         <table className="w-full text-sm">
           <thead className="text-slate-500 text-left">
@@ -658,48 +584,43 @@ export default function OrdenDetalle() {
         )}
       </section>
 
-      {/* Entrega despues de garantia */}
-      {orden.estado === 'garantia' && (
+      {/* Garantias */}
+      {orden.fechaEntregaReal && (
         <section className={cardClass}>
-          <h2 className="font-semibold text-slate-700">Entrega (despues de garantia)</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelClass}>Fecha de entrega</label>
-              <input
-                type="date"
-                className={inputClass}
-                value={fechaEntregaGarantia}
-                onChange={(e) => setFechaEntregaGarantia(e.target.value)}
-              />
-            </div>
-            <label className="flex items-center gap-2 mt-6 text-sm text-slate-700">
-              <input
-                type="checkbox"
-                checked={firmaClienteEntregaGarantia}
-                onChange={(e) => setFirmaClienteEntregaGarantia(e.target.checked)}
-              />
-              El cliente firmo de conformidad al recibir su moto
-            </label>
+          <div className="flex items-center justify-between">
+            <h2 className="font-semibold text-slate-700">Garantias de esta orden</h2>
+            {puedeAbrirGarantia && (
+              <button
+                type="button"
+                onClick={handleAbrirGarantia}
+                className="bg-amber-600 text-white rounded-md px-3 py-1.5 text-sm font-medium hover:bg-amber-700"
+              >
+                + El cliente regreso por garantia
+              </button>
+            )}
           </div>
-          {errorEntregaGarantia && <p className="text-sm text-red-600">{errorEntregaGarantia}</p>}
-          <button
-            type="button"
-            onClick={guardarEntregaGarantia}
-            disabled={guardandoEntregaGarantia}
-            className="bg-green-700 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-green-800 disabled:opacity-50"
-          >
-            {guardandoEntregaGarantia ? 'Guardando...' : 'Marcar como entregada'}
-          </button>
-        </section>
-      )}
 
-      {orden.fechaEntregaGarantia && orden.estado !== 'garantia' && (
-        <section className={cardClass}>
-          <h2 className="font-semibold text-slate-700">Entrega (despues de garantia)</h2>
-          <p className="text-sm text-slate-600">
-            Reentregada el {orden.fechaEntregaGarantia} tras revisar la garantia. Firma de
-            conformidad: {orden.firmaClienteEntregaGarantia ? 'Si' : 'No'}.
-          </p>
+          {orden.GarantiaEventos?.length > 0 ? (
+            <>
+              <div className="bg-slate-50 rounded-md p-3">
+                <p className="text-xs text-slate-400 mb-1">Diagnostico original (primera visita):</p>
+                <p className="text-sm text-slate-600">{orden.diagnostico || 'Sin diagnostico registrado.'}</p>
+              </div>
+              <div className="space-y-4">
+                {orden.GarantiaEventos.map((evento, idx) => (
+                  <GarantiaEventoCard
+                    key={evento.id}
+                    ordenId={id}
+                    evento={evento}
+                    numero={idx + 1}
+                    onChange={cargar}
+                  />
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="text-sm text-slate-400">Esta moto no ha regresado por garantia.</p>
+          )}
         </section>
       )}
     </div>

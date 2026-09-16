@@ -137,7 +137,7 @@ export default function Recepcion() {
       <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
         Si una moto ya entregada regresa por el mismo problema (garantia), no registres una
         recepcion nueva aqui: ve a <span className="font-medium">Servicios</span>, abre esa orden y
-        cambia su estado a "Reabierta por garantia".
+        usa el boton "El cliente regreso por garantia".
       </p>
 
       {error && <p className="text-sm text-red-600">{error}</p>}

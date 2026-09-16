@@ -7,6 +7,7 @@ const OrdenServicio = require('./OrdenServicio');
 const OrdenServicioChecklistItem = require('./OrdenServicioChecklistItem');
 const OrdenServicioFoto = require('./OrdenServicioFoto');
 const OrdenServicioItem = require('./OrdenServicioItem');
+const GarantiaEvento = require('./GarantiaEvento');
 const Producto = require('./Producto');
 const Insumo = require('./Insumo');
 const Venta = require('./Venta');
@@ -22,11 +23,12 @@ Moto.belongsTo(Cliente, { foreignKey: 'clienteId' });
 Moto.hasMany(OrdenServicio, { foreignKey: 'motoId', onDelete: 'CASCADE' });
 OrdenServicio.belongsTo(Moto, { foreignKey: 'motoId' });
 
-// OrdenServicio (garantia liga a una orden previa)
-OrdenServicio.belongsTo(OrdenServicio, {
-  as: 'ordenGarantiaOriginal',
-  foreignKey: 'ordenGarantiaOriginalId',
-});
+// OrdenServicio <-> GarantiaEvento (cada reingreso por garantia)
+OrdenServicio.hasMany(GarantiaEvento, { foreignKey: 'ordenServicioId', onDelete: 'CASCADE' });
+GarantiaEvento.belongsTo(OrdenServicio, { foreignKey: 'ordenServicioId' });
+
+GarantiaEvento.hasMany(OrdenServicioItem, { foreignKey: 'garantiaEventoId', onDelete: 'CASCADE' });
+OrdenServicioItem.belongsTo(GarantiaEvento, { foreignKey: 'garantiaEventoId' });
 
 // OrdenServicio <-> checklist / fotos / items
 OrdenServicio.hasMany(OrdenServicioChecklistItem, {
@@ -68,6 +70,7 @@ module.exports = {
   OrdenServicioChecklistItem,
   OrdenServicioFoto,
   OrdenServicioItem,
+  GarantiaEvento,
   Producto,
   Insumo,
   Venta,

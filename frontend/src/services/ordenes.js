@@ -19,6 +19,11 @@ export const subirFoto = (id, file) => {
 };
 export const eliminarFoto = (id, fotoId) => api.delete(`/ordenes/${id}/fotos/${fotoId}`);
 
+export const crearGarantiaEvento = (id, data) =>
+  api.post(`/ordenes/${id}/garantia`, data).then((r) => r.data);
+export const actualizarGarantiaEvento = (id, garantiaId, data) =>
+  api.put(`/ordenes/${id}/garantia/${garantiaId}`, data).then((r) => r.data);
+
 export const CHECKLIST_ITEMS = [
   'Espejos',
   'Asiento',

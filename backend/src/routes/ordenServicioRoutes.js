@@ -26,6 +26,9 @@ router.delete('/:id', controller.remove);
 router.post('/:id/items', controller.agregarItem);
 router.delete('/:id/items/:itemId', controller.eliminarItem);
 
+router.post('/:id/garantia', controller.crearGarantiaEvento);
+router.put('/:id/garantia/:garantiaId', controller.actualizarGarantiaEvento);
+
 router.post('/:id/fotos', upload.single('foto'), controller.agregarFoto);
 router.delete('/:id/fotos/:fotoId', controller.eliminarFoto);
 

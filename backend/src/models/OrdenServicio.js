@@ -31,22 +31,11 @@ const OrdenServicio = sequelize.define('OrdenServicio', {
     allowNull: false,
     defaultValue: 'recibida',
   },
-  enGarantia: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-  },
   firmaClienteRecepcion: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
   firmaClienteEntrega: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-  },
-  fechaReingresoGarantia: DataTypes.DATEONLY,
-  diagnosticoGarantia: DataTypes.TEXT,
-  fechaEntregaGarantia: DataTypes.DATEONLY,
-  firmaClienteEntregaGarantia: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
