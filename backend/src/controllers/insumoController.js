@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Insumo, InsumoConsumo, Mecanico } = require('../models');
+const { Insumo, InsumoConsumo, User } = require('../models');
 
 async function list(req, res, next) {
   try {
@@ -62,7 +62,7 @@ async function listConsumos(req, res, next) {
 
     const consumos = await InsumoConsumo.findAll({
       where,
-      include: [Insumo, Mecanico],
+      include: [Insumo, { model: User, as: 'Mecanico', attributes: { exclude: ['passwordHash'] } }],
       order: [['id', 'DESC']],
     });
     res.json(consumos);
@@ -87,7 +87,7 @@ async function registrarConsumo(req, res, next) {
     if (!mecanicoId) {
       return res.status(400).json({ message: 'Selecciona quien consumio el insumo' });
     }
-    const mecanico = await Mecanico.findByPk(mecanicoId);
+    const mecanico = await User.findByPk(mecanicoId);
     if (!mecanico) return res.status(400).json({ message: 'Mecanico invalido' });
 
     const consumo = await InsumoConsumo.create({
@@ -100,7 +100,9 @@ async function registrarConsumo(req, res, next) {
 
     await insumo.update({ stock: Number(insumo.stock) - cantidadNum });
 
-    const consumoCompleto = await InsumoConsumo.findByPk(consumo.id, { include: [Insumo, Mecanico] });
+    const consumoCompleto = await InsumoConsumo.findByPk(consumo.id, {
+      include: [Insumo, { model: User, as: 'Mecanico', attributes: { exclude: ['passwordHash'] } }],
+    });
     res.status(201).json(consumoCompleto);
   } catch (err) {
     next(err);

@@ -11,7 +11,7 @@ const motoRoutes = require('./routes/motoRoutes');
 const ordenServicioRoutes = require('./routes/ordenServicioRoutes');
 const productoRoutes = require('./routes/productoRoutes');
 const insumoRoutes = require('./routes/insumoRoutes');
-const mecanicoRoutes = require('./routes/mecanicoRoutes');
+const userRoutes = require('./routes/userRoutes');
 const ventaRoutes = require('./routes/ventaRoutes');
 const gastoRoutes = require('./routes/gastoRoutes');
 const configuracionRoutes = require('./routes/configuracionRoutes');
@@ -33,7 +33,7 @@ function createServer() {
   app.use('/api/ordenes', ordenServicioRoutes);
   app.use('/api/productos', productoRoutes);
   app.use('/api/insumos', insumoRoutes);
-  app.use('/api/mecanicos', mecanicoRoutes);
+  app.use('/api/usuarios', userRoutes);
   app.use('/api/ventas', ventaRoutes);
   app.use('/api/gastos', gastoRoutes);
   app.use('/api/configuracion', configuracionRoutes);

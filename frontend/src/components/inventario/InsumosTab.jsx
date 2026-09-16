@@ -7,7 +7,7 @@ import {
   listConsumosInsumo,
   registrarConsumoInsumo,
 } from '../../services/insumos';
-import { listMecanicos, createMecanico } from '../../services/mecanicos';
+import { listUsuarios, createUsuario } from '../../services/usuarios';
 import Modal from '../Modal';
 import { PencilIcon, TrashIcon, PlusIcon, ClipboardIcon } from '../../ui/icons';
 import {
@@ -45,6 +45,7 @@ export default function InsumosTab() {
   const [mecanicos, setMecanicos] = useState([]);
   const [nuevoMecanicoOpen, setNuevoMecanicoOpen] = useState(false);
   const [nuevoMecanicoNombre, setNuevoMecanicoNombre] = useState('');
+  const [credencialesNuevas, setCredencialesNuevas] = useState(null);
 
   async function cargar() {
     setInsumos(await listInsumos(q));
@@ -55,7 +56,7 @@ export default function InsumosTab() {
   }
 
   async function cargarMecanicos() {
-    setMecanicos(await listMecanicos());
+    setMecanicos(await listUsuarios({ role: 'mecanico' }));
   }
 
   useEffect(() => {
@@ -99,16 +100,22 @@ export default function InsumosTab() {
     setErrorConsumo('');
     setNuevoMecanicoOpen(false);
     setNuevoMecanicoNombre('');
+    setCredencialesNuevas(null);
     setConsumoModalOpen(true);
   }
 
   async function handleCrearMecanico() {
-    if (!nuevoMecanicoNombre.trim()) return;
-    const creado = await createMecanico({ nombre: nuevoMecanicoNombre.trim() });
+    const nombre = nuevoMecanicoNombre.trim();
+    if (!nombre) return;
+    const sufijo = Math.floor(100 + Math.random() * 900);
+    const username = `${nombre.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '')}${sufijo}`;
+    const password = `moto${Math.floor(1000 + Math.random() * 9000)}`;
+    const creado = await createUsuario({ name: nombre, username, password, role: 'mecanico' });
     await cargarMecanicos();
     setConsumoForm({ ...consumoForm, mecanicoId: creado.id });
     setNuevoMecanicoOpen(false);
     setNuevoMecanicoNombre('');
+    setCredencialesNuevas({ username, password });
   }
 
   async function handleRegistrarConsumo(e) {
@@ -210,7 +217,7 @@ export default function InsumosTab() {
                 <td className="px-5 py-3 text-slate-600">
                   {c.cantidad} {c.Insumo?.unidad}
                 </td>
-                <td className="px-5 py-3 text-slate-600">{c.Mecanico?.nombre || '-'}</td>
+                <td className="px-5 py-3 text-slate-600">{c.Mecanico?.name || '-'}</td>
                 <td className="px-5 py-3 text-slate-600">{c.nota || '-'}</td>
               </tr>
             ))}
@@ -271,6 +278,12 @@ export default function InsumosTab() {
 
           <div>
             <label className={labelClass}>Mecanico que lo consumio</label>
+            {credencialesNuevas && (
+              <p className="mb-2 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-xs text-orange-800">
+                Cuenta creada — usuario <strong>{credencialesNuevas.username}</strong> / contrasena{' '}
+                <strong>{credencialesNuevas.password}</strong>. Anotala, se puede cambiar despues en Usuarios.
+              </p>
+            )}
             {nuevoMecanicoOpen ? (
               <div className="flex gap-2">
                 <input
@@ -297,7 +310,7 @@ export default function InsumosTab() {
                   <option value="">Selecciona...</option>
                   {mecanicos.map((m) => (
                     <option key={m.id} value={m.id}>
-                      {m.nombre}
+                      {m.name}
                     </option>
                   ))}
                 </select>

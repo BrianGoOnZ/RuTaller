@@ -26,4 +26,15 @@ const NIVELES = ['vacio', '1/4', '1/2', '3/4', 'lleno'];
 
 const ESTADOS_ORDEN = ['recibida', 'diagnostico', 'reparacion', 'lista', 'entregada', 'garantia', 'cancelada'];
 
-module.exports = { CHECKLIST_ITEMS, NIVELES, ESTADOS_ORDEN };
+const ROLES_USUARIO = ['administrador', 'cajero', 'mecanico'];
+
+const ESPECIALIDADES_MECANICO = [
+  'General',
+  'Motor y transmision',
+  'Sistema electrico',
+  'Frenos y suspension',
+  'Diagnostico y electronica',
+  'Carroceria y pintura',
+];
+
+module.exports = { CHECKLIST_ITEMS, NIVELES, ESTADOS_ORDEN, ROLES_USUARIO, ESPECIALIDADES_MECANICO };

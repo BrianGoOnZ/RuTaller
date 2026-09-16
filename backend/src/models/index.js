@@ -11,7 +11,6 @@ const GarantiaEvento = require('./GarantiaEvento');
 const Producto = require('./Producto');
 const Insumo = require('./Insumo');
 const InsumoConsumo = require('./InsumoConsumo');
-const Mecanico = require('./Mecanico');
 const Venta = require('./Venta');
 const VentaItem = require('./VentaItem');
 const Gasto = require('./Gasto');
@@ -58,8 +57,8 @@ Gasto.belongsTo(Insumo, { foreignKey: 'insumoId' });
 Insumo.hasMany(InsumoConsumo, { foreignKey: 'insumoId', onDelete: 'CASCADE' });
 InsumoConsumo.belongsTo(Insumo, { foreignKey: 'insumoId' });
 
-Mecanico.hasMany(InsumoConsumo, { foreignKey: 'mecanicoId' });
-InsumoConsumo.belongsTo(Mecanico, { foreignKey: 'mecanicoId' });
+User.hasMany(InsumoConsumo, { foreignKey: 'mecanicoId' });
+InsumoConsumo.belongsTo(User, { foreignKey: 'mecanicoId', as: 'Mecanico' });
 
 async function syncDatabase() {
   // SQLite exige que las llaves foraneas esten desactivadas mientras se
@@ -72,6 +71,16 @@ async function syncDatabase() {
   } finally {
     await sequelize.query('PRAGMA foreign_keys = ON');
   }
+
+  // Cuentas que ya existian antes de que el sistema de roles existiera
+  // (columna role recien agregada, sin valor) eran por definicion la unica
+  // cuenta admin de esa instalacion - se asignan como administrador, nunca
+  // como mecanico, para no perder acceso a su propia cuenta.
+  await User.update({ role: 'administrador' }, { where: { role: null } });
+
+  // Tabla huerfana de una version anterior (el catalogo de Mecanicos se
+  // fusiono dentro de Users); ya no tiene modelo ni referencias.
+  await sequelize.query('DROP TABLE IF EXISTS Mecanicos');
 
   const existingConfig = await Configuracion.findByPk(1);
   if (!existingConfig) {
@@ -92,7 +101,6 @@ module.exports = {
   Producto,
   Insumo,
   InsumoConsumo,
-  Mecanico,
   Venta,
   VentaItem,
   Gasto,

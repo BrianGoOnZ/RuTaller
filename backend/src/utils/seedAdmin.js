@@ -10,6 +10,7 @@ async function seedAdminIfMissing() {
     name: 'Administrador',
     username: process.env.SEED_ADMIN_USERNAME || 'admin',
     passwordHash,
+    role: 'administrador',
   });
 }
 

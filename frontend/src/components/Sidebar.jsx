@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 
 const iconProps = {
   width: 20,
@@ -58,11 +59,12 @@ const icons = {
       <path d="M3 4h2l2 11h10l2-8H6.5" />
     </svg>
   ),
-  mecanicos: (
+  usuarios: (
     <svg {...iconProps}>
-      <circle cx="7" cy="7" r="3" />
-      <circle cx="17" cy="17" r="3" />
-      <line x1="9.5" y1="9.5" x2="14.5" y2="14.5" />
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <circle cx="9" cy="12" r="2" />
+      <line x1="13" y1="10" x2="18" y2="10" />
+      <line x1="13" y1="14" x2="17" y2="14" />
     </svg>
   ),
   finanzas: (
@@ -84,20 +86,25 @@ const icons = {
   ),
 };
 
+const ADMIN_CAJERO = ['administrador', 'cajero'];
+const SOLO_ADMIN = ['administrador'];
+
 const links = [
   { to: '/', label: 'Inicio', end: true, icon: 'inicio' },
-  { to: '/clientes', label: 'Clientes', icon: 'clientes' },
+  { to: '/clientes', label: 'Clientes', icon: 'clientes', roles: ADMIN_CAJERO },
   { to: '/recepcion', label: 'Recepcion', icon: 'recepcion' },
   { to: '/servicios', label: 'Servicios', icon: 'servicios' },
   { to: '/inventario', label: 'Inventario', icon: 'inventario' },
-  { to: '/ventas', label: 'Ventas', icon: 'ventas' },
-  { to: '/mecanicos', label: 'Mecanicos', icon: 'mecanicos' },
-  { to: '/finanzas', label: 'Finanzas', icon: 'finanzas' },
-  { to: '/configuracion', label: 'Configuracion', icon: 'configuracion' },
+  { to: '/ventas', label: 'Ventas', icon: 'ventas', roles: ADMIN_CAJERO },
+  { to: '/usuarios', label: 'Usuarios', icon: 'usuarios', roles: SOLO_ADMIN },
+  { to: '/finanzas', label: 'Finanzas', icon: 'finanzas', roles: SOLO_ADMIN },
+  { to: '/configuracion', label: 'Configuracion', icon: 'configuracion', roles: SOLO_ADMIN },
 ];
 
 export default function Sidebar() {
   const [expandido, setExpandido] = useState(false);
+  const role = useAuthStore((s) => s.user?.role);
+  const linksVisibles = links.filter((link) => !link.roles || link.roles.includes(role));
 
   return (
     <aside
@@ -111,7 +118,7 @@ export default function Sidebar() {
         <span className="text-xl font-bold">{expandido ? 'RuTaller' : 'RT'}</span>
       </div>
       <nav className="flex-1 px-2 py-4 space-y-1">
-        {links.map((link) => (
+        {linksVisibles.map((link) => (
           <NavLink
             key={link.to}
             to={link.to}
