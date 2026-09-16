@@ -138,9 +138,12 @@ async function update(req, res, next) {
       'firmaClienteRecepcion',
       'firmaClienteEntrega',
     ];
+    const camposFecha = ['fechaEntregaEstimada', 'fechaEntregaReal'];
     const cambios = {};
     camposPermitidos.forEach((campo) => {
-      if (req.body[campo] !== undefined) cambios[campo] = req.body[campo];
+      if (req.body[campo] === undefined) return;
+      const valor = req.body[campo];
+      cambios[campo] = camposFecha.includes(campo) && valor === '' ? null : valor;
     });
 
     await orden.update(cambios);

@@ -35,12 +35,14 @@ export default function OrdenDetalle() {
 
   const [fechaEntregaReal, setFechaEntregaReal] = useState('');
   const [firmaClienteEntrega, setFirmaClienteEntrega] = useState(false);
+  const [errorEntrega, setErrorEntrega] = useState('');
+  const [guardandoEntrega, setGuardandoEntrega] = useState(false);
 
   async function cargar() {
     const data = await getOrden(id);
     setOrden(data);
     setDiagnostico(data.diagnostico || '');
-    setFechaEntregaReal(data.fechaEntregaReal || '');
+    setFechaEntregaReal(data.fechaEntregaReal || new Date().toISOString().slice(0, 10));
     setFirmaClienteEntrega(data.firmaClienteEntrega);
   }
 
@@ -112,12 +114,24 @@ export default function OrdenDetalle() {
   }
 
   async function guardarEntrega() {
-    await updateOrden(id, {
-      fechaEntregaReal,
-      firmaClienteEntrega,
-      estado: 'entregada',
-    });
-    cargar();
+    setErrorEntrega('');
+    if (!fechaEntregaReal) {
+      setErrorEntrega('Captura la fecha de entrega real');
+      return;
+    }
+    setGuardandoEntrega(true);
+    try {
+      await updateOrden(id, {
+        fechaEntregaReal,
+        firmaClienteEntrega,
+        estado: 'entregada',
+      });
+      await cargar();
+    } catch (err) {
+      setErrorEntrega(err.response?.data?.message || 'No se pudo marcar como entregada');
+    } finally {
+      setGuardandoEntrega(false);
+    }
   }
 
   if (!orden) return <p className="text-slate-500">Cargando...</p>;
@@ -526,13 +540,18 @@ export default function OrdenDetalle() {
             El cliente firmo de conformidad al recibir su moto
           </label>
         </div>
+        {errorEntrega && <p className="text-sm text-red-600">{errorEntrega}</p>}
         <button
           type="button"
           onClick={guardarEntrega}
-          className="bg-green-700 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-green-800"
+          disabled={guardandoEntrega}
+          className="bg-green-700 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-green-800 disabled:opacity-50"
         >
-          Marcar como entregada
+          {guardandoEntrega ? 'Guardando...' : 'Marcar como entregada'}
         </button>
+        {orden.estado === 'entregada' && (
+          <p className="text-sm text-green-700">Esta orden ya fue marcada como entregada.</p>
+        )}
       </section>
     </div>
   );
