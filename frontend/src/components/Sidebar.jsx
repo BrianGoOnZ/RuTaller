@@ -7,6 +7,7 @@ const links = [
   { to: '/servicios', label: 'Servicios' },
   { to: '/inventario', label: 'Inventario' },
   { to: '/finanzas', label: 'Finanzas' },
+  { to: '/configuracion', label: 'Configuracion' },
 ];
 
 export default function Sidebar() {
