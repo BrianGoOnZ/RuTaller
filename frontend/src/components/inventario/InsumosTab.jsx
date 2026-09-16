@@ -21,7 +21,7 @@ import {
   btnGhost,
   actionBtnNeutral,
   actionBtnDanger,
-  actionBtnAmber,
+  actionBtnPrimary,
   avatarInitial,
   avatarClass,
 } from '../../ui/styles';
@@ -166,7 +166,7 @@ export default function InsumosTab() {
                 <td className="px-5 py-3 text-slate-600">{i.stock}</td>
                 <td className="px-5 py-3">
                   <div className="flex items-center justify-end gap-2">
-                    <button onClick={() => abrirConsumo(i)} className={actionBtnAmber}>
+                    <button onClick={() => abrirConsumo(i)} className={actionBtnPrimary}>
                       <ClipboardIcon /> Registrar consumo
                     </button>
                     <button onClick={() => abrirEditar(i)} className={actionBtnNeutral}>
@@ -340,10 +340,7 @@ export default function InsumosTab() {
             />
           </div>
           {errorConsumo && <p className="text-sm text-red-600">{errorConsumo}</p>}
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-amber-700"
-          >
+          <button type="submit" className={`${btnPrimary} w-full`}>
             Registrar consumo
           </button>
         </form>

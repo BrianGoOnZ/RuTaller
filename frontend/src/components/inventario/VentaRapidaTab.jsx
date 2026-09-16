@@ -3,7 +3,7 @@ import { listProductos } from '../../services/productos';
 import { listVentas, createVenta } from '../../services/ventas';
 import SearchSelect from '../SearchSelect';
 import { TrashIcon } from '../../ui/icons';
-import { inputClass, cardClass, tbodyClass } from '../../ui/styles';
+import { inputClass, cardClass, tbodyClass, btnSuccess } from '../../ui/styles';
 
 export default function VentaRapidaTab() {
   const [carrito, setCarrito] = useState([]);
@@ -125,7 +125,7 @@ export default function VentaRapidaTab() {
         <button
           onClick={cobrar}
           disabled={carrito.length === 0}
-          className="w-full rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-green-800 disabled:opacity-50"
+          className={`${btnSuccess} w-full`}
         >
           Cobrar
         </button>

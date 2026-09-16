@@ -11,20 +11,27 @@ export const theadRowClass =
 export const tbodyClass = 'divide-y divide-slate-100';
 export const rowHoverClass = 'transition-colors hover:bg-slate-50/70';
 
+// Estandar de color por tipo de accion en toda la app:
+// naranja = accion principal (crear/guardar), gris = secundaria/neutral,
+// rojo = destructiva, verde = confirmar/completar, ambar = solo garantia.
 export const btnPrimary =
-  'rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-800 disabled:opacity-50';
+  'rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-orange-700 disabled:opacity-50';
 export const btnPrimarySmall =
-  'rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:opacity-50';
+  'rounded-md bg-orange-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-700 disabled:opacity-50';
 export const btnGhost =
   'rounded-md border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100';
 export const btnDanger =
   'rounded-md border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50';
+export const btnSuccess =
+  'rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-green-800 disabled:opacity-50';
+export const btnWarning =
+  'rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-amber-700 disabled:opacity-50';
 
 export const actionBtn =
   'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors';
 export const actionBtnNeutral = `${actionBtn} border-slate-200 text-slate-700 hover:bg-slate-100`;
 export const actionBtnDanger = `${actionBtn} border-red-200 text-red-600 hover:bg-red-50`;
-export const actionBtnAmber = `${actionBtn} border-amber-200 text-amber-700 hover:bg-amber-50`;
+export const actionBtnPrimary = `${actionBtn} border-orange-200 text-orange-700 hover:bg-orange-50`;
 
 export function avatarInitial(nombre) {
   return (nombre || '?').charAt(0).toUpperCase();
