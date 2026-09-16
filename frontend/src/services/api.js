@@ -13,4 +13,17 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      useAuthStore.getState().logout();
+      if (!window.location.hash.startsWith('#/login')) {
+        window.location.hash = '#/login?expirada=1';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import { useAuthStore } from '../store/authStore';
 
@@ -9,6 +9,8 @@ export default function Login() {
   const [error, setError] = useState('');
   const login = useAuthStore((state) => state.login);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const sesionExpirada = searchParams.get('expirada') === '1';
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -26,6 +28,11 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-slate-100">
       <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-8 w-80 space-y-4">
         <h1 className="text-xl font-bold text-center text-slate-800">RuTaller</h1>
+        {sesionExpirada && !error && (
+          <p className="text-sm text-amber-700 text-center">
+            Tu sesion anterior expiro. Vuelve a iniciar sesion — tu informacion sigue guardada.
+          </p>
+        )}
         {error && <p className="text-sm text-red-600 text-center">{error}</p>}
         <input
           className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm"
