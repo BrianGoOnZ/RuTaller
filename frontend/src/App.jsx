@@ -10,6 +10,8 @@ import Recepcion from './pages/Recepcion';
 import Servicios from './pages/Servicios';
 import OrdenDetalle from './pages/OrdenDetalle';
 import Inventario from './pages/Inventario';
+import Ventas from './pages/Ventas';
+import Mecanicos from './pages/Mecanicos';
 import Finanzas from './pages/Finanzas';
 import Configuracion from './pages/Configuracion';
 
@@ -33,6 +35,8 @@ export default function App() {
           <Route path="/servicios" element={<Servicios />} />
           <Route path="/servicios/:id" element={<OrdenDetalle />} />
           <Route path="/inventario" element={<Inventario />} />
+          <Route path="/ventas" element={<Ventas />} />
+          <Route path="/mecanicos" element={<Mecanicos />} />
           <Route path="/finanzas" element={<Finanzas />} />
           <Route path="/configuracion" element={<Configuracion />} />
         </Route>

@@ -51,6 +51,20 @@ const icons = {
       <line x1="12" y1="12" x2="12" y2="21" />
     </svg>
   ),
+  ventas: (
+    <svg {...iconProps}>
+      <circle cx="9" cy="20" r="1.4" />
+      <circle cx="17" cy="20" r="1.4" />
+      <path d="M3 4h2l2 11h10l2-8H6.5" />
+    </svg>
+  ),
+  mecanicos: (
+    <svg {...iconProps}>
+      <circle cx="7" cy="7" r="3" />
+      <circle cx="17" cy="17" r="3" />
+      <line x1="9.5" y1="9.5" x2="14.5" y2="14.5" />
+    </svg>
+  ),
   finanzas: (
     <svg {...iconProps}>
       <circle cx="12" cy="12" r="9" />
@@ -76,6 +90,8 @@ const links = [
   { to: '/recepcion', label: 'Recepcion', icon: 'recepcion' },
   { to: '/servicios', label: 'Servicios', icon: 'servicios' },
   { to: '/inventario', label: 'Inventario', icon: 'inventario' },
+  { to: '/ventas', label: 'Ventas', icon: 'ventas' },
+  { to: '/mecanicos', label: 'Mecanicos', icon: 'mecanicos' },
   { to: '/finanzas', label: 'Finanzas', icon: 'finanzas' },
   { to: '/configuracion', label: 'Configuracion', icon: 'configuracion' },
 ];
