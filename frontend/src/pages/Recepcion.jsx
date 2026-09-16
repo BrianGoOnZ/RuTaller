@@ -6,9 +6,28 @@ import { createOrden, subirFoto, CHECKLIST_ITEMS } from '../services/ordenes';
 import SearchSelect from '../components/SearchSelect';
 import NivelSlider from '../components/NivelSlider';
 
-const inputClass = 'w-full border border-slate-300 rounded-md px-3 py-2 text-sm';
+const inputClass =
+  'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm transition-colors focus:outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-900/10';
 const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
-const cardClass = 'bg-white rounded-lg shadow-sm p-5 space-y-4';
+
+const btnGhost =
+  'rounded-md border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100';
+const btnPrimarySmall =
+  'rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800';
+
+function Seccion({ numero, titulo, children }) {
+  return (
+    <section className="space-y-4 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+      <div className="flex items-center gap-3">
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">
+          {numero}
+        </span>
+        <h2 className="text-base font-semibold text-slate-800">{titulo}</h2>
+      </div>
+      {children}
+    </section>
+  );
+}
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10);
@@ -134,26 +153,23 @@ export default function Recepcion() {
         <p className="text-slate-500">Registra el ingreso de una moto al taller.</p>
       </div>
 
-      <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
-        Si una moto ya entregada regresa por el mismo problema (garantia), no registres una
-        recepcion nueva aqui: ve a <span className="font-medium">Servicios</span>, abre esa orden y
-        usa el boton "El cliente regreso por garantia".
-      </p>
-
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+          {error}
+        </p>
+      )}
 
       {/* Cliente */}
-      <section className={cardClass}>
-        <h2 className="font-semibold text-slate-700">Cliente</h2>
+      <Seccion numero={1} titulo="Cliente">
         {cliente || clienteNuevo ? (
-          <div className="flex items-center justify-between bg-slate-50 rounded-md px-3 py-2">
+          <div className="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3">
             <div>
               <p className="font-medium text-slate-800">{(cliente || clienteNuevo).nombre}</p>
               <p className="text-sm text-slate-500">{(cliente || clienteNuevo).telefono}</p>
             </div>
             <button
               type="button"
-              className="text-sm text-slate-500 hover:underline"
+              className={btnGhost}
               onClick={() => {
                 setCliente(null);
                 setClienteNuevo(null);
@@ -178,7 +194,9 @@ export default function Recepcion() {
               )}
               onSelect={seleccionarCliente}
             />
-            <p className="text-xs text-slate-400">O registra uno nuevo:</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+              O registra uno nuevo
+            </p>
             <div className="grid grid-cols-2 gap-3">
               <input
                 className={inputClass}
@@ -205,23 +223,18 @@ export default function Recepcion() {
                 onChange={(e) => setClienteForm({ ...clienteForm, cp: e.target.value })}
               />
             </div>
-            <button
-              type="button"
-              onClick={confirmarClienteNuevo}
-              className="text-sm font-medium text-slate-700 hover:underline"
-            >
+            <button type="button" onClick={confirmarClienteNuevo} className={btnPrimarySmall}>
               Usar este cliente nuevo
             </button>
           </div>
         )}
-      </section>
+      </Seccion>
 
       {/* Moto */}
       {(cliente || clienteNuevo) && (
-        <section className={cardClass}>
-          <h2 className="font-semibold text-slate-700">Moto</h2>
+        <Seccion numero={2} titulo="Moto">
           {moto || motoNueva ? (
-            <div className="flex items-center justify-between bg-slate-50 rounded-md px-3 py-2">
+            <div className="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3">
               <div>
                 <p className="font-medium text-slate-800">
                   {(moto || motoNueva).marca} {(moto || motoNueva).modelo}
@@ -230,7 +243,7 @@ export default function Recepcion() {
               </div>
               <button
                 type="button"
-                className="text-sm text-slate-500 hover:underline"
+                className={btnGhost}
                 onClick={() => {
                   setMoto(null);
                   setMotoNueva(null);
@@ -242,21 +255,25 @@ export default function Recepcion() {
           ) : (
             <div className="space-y-3">
               {motos.length > 0 && (
-                <div className="space-y-1">
-                  <p className="text-xs text-slate-400">Motos de este cliente:</p>
+                <div className="space-y-1.5">
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    Motos de este cliente
+                  </p>
                   {motos.map((m) => (
                     <button
                       type="button"
                       key={m.id}
                       onClick={() => setMoto(m)}
-                      className="block w-full text-left border border-slate-200 rounded-md px-3 py-2 text-sm hover:bg-slate-50"
+                      className="block w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm transition-colors hover:border-slate-300 hover:bg-slate-50"
                     >
                       {m.marca} {m.modelo} - Placas: {m.placas || 'N/A'}
                     </button>
                   ))}
                 </div>
               )}
-              <p className="text-xs text-slate-400">O registra una moto nueva:</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                O registra una moto nueva
+              </p>
               <div className="grid grid-cols-2 gap-3">
                 <input
                   className={inputClass}
@@ -301,19 +318,18 @@ export default function Recepcion() {
                   if (!motoForm.marca || !motoForm.modelo) return;
                   setMotoNueva(motoForm);
                 }}
-                className="text-sm font-medium text-slate-700 hover:underline"
+                className={btnPrimarySmall}
               >
                 Usar esta moto nueva
               </button>
             </div>
           )}
-        </section>
+        </Seccion>
       )}
 
       {/* Datos de ingreso */}
-      <section className={cardClass}>
-        <h2 className="font-semibold text-slate-700">Datos de ingreso</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <Seccion numero={3} titulo="Datos de ingreso">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <div>
             <label className={labelClass}>Fecha de ingreso</label>
             <input
@@ -352,24 +368,23 @@ export default function Recepcion() {
             />
           </div>
         </div>
-      </section>
+      </Seccion>
 
       {/* Checklist */}
-      <section className={cardClass}>
-        <h2 className="font-semibold text-slate-700">Inventario / checklist de ingreso</h2>
-        <div className="grid sm:grid-cols-2 gap-x-6 gap-y-3">
+      <Seccion numero={4} titulo="Inventario / checklist de ingreso">
+        <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
           {checklist.map((item) => (
             <div key={item.nombre} className="border-b border-slate-100 pb-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-700">{item.nombre}</span>
-                <div className="flex gap-1">
+                <div className="flex gap-1.5">
                   <button
                     type="button"
                     onClick={() => actualizarChecklist(item.nombre, 'estado', 'bien')}
-                    className={`px-2 py-1 text-xs rounded-md border ${
+                    className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
                       item.estado === 'bien'
-                        ? 'bg-green-600 text-white border-green-600'
-                        : 'border-slate-300 text-slate-600'
+                        ? 'border-green-600 bg-green-600 text-white'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
                     Bien
@@ -377,10 +392,10 @@ export default function Recepcion() {
                   <button
                     type="button"
                     onClick={() => actualizarChecklist(item.nombre, 'estado', 'detalle')}
-                    className={`px-2 py-1 text-xs rounded-md border ${
+                    className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
                       item.estado === 'detalle'
-                        ? 'bg-amber-600 text-white border-amber-600'
-                        : 'border-slate-300 text-slate-600'
+                        ? 'border-amber-600 bg-amber-600 text-white'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
                     Detalle
@@ -398,53 +413,55 @@ export default function Recepcion() {
             </div>
           ))}
         </div>
-      </section>
+      </Seccion>
 
       {/* Niveles */}
-      <section className={cardClass}>
-        <h2 className="font-semibold text-slate-700">Niveles</h2>
-        <div className="grid sm:grid-cols-2 gap-6">
+      <Seccion numero={5} titulo="Niveles">
+        <div className="grid gap-6 sm:grid-cols-2">
           <NivelSlider label="Gasolina" value={nivelGasolina} onChange={setNivelGasolina} />
           <NivelSlider label="Aceite" value={nivelAceite} onChange={setNivelAceite} />
         </div>
-      </section>
+      </Seccion>
 
       {/* Trabajo solicitado */}
-      <section className={cardClass}>
-        <h2 className="font-semibold text-slate-700">Trabajo solicitado</h2>
+      <Seccion numero={6} titulo="Trabajo solicitado">
         <textarea
           className={`${inputClass} min-h-24`}
           placeholder="Que reporta el cliente..."
           value={trabajoSolicitado}
           onChange={(e) => setTrabajoSolicitado(e.target.value)}
         />
-      </section>
+      </Seccion>
 
       {/* Fotos */}
-      <section className={cardClass}>
-        <h2 className="font-semibold text-slate-700">Fotos de la moto</h2>
-        <input type="file" accept="image/*" multiple onChange={handleFotos} />
+      <Seccion numero={7} titulo="Fotos de la moto">
+        <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-200 px-4 py-6 text-center transition-colors hover:border-slate-300 hover:bg-slate-50">
+          <span className="text-sm font-medium text-slate-600">Haz clic para elegir fotos</span>
+          <span className="text-xs text-slate-400">Puedes seleccionar varias imagenes</span>
+          <input type="file" accept="image/*" multiple onChange={handleFotos} className="hidden" />
+        </label>
         {fotos.length > 0 && (
           <p className="text-sm text-slate-500">{fotos.length} foto(s) seleccionada(s)</p>
         )}
-      </section>
+      </Seccion>
 
       {/* Firma */}
-      <section className={cardClass}>
-        <label className="flex items-center gap-2 text-slate-700">
+      <Seccion numero={8} titulo="Firma">
+        <label className="flex items-center gap-2 text-sm text-slate-700">
           <input
             type="checkbox"
             checked={firmaClienteRecepcion}
             onChange={(e) => setFirmaClienteRecepcion(e.target.checked)}
+            className="h-4 w-4 rounded border-slate-300"
           />
           El cliente firmo la hoja fisica de recepcion
         </label>
-      </section>
+      </Seccion>
 
       <button
         type="submit"
         disabled={guardando}
-        className="bg-slate-900 text-white rounded-md px-6 py-3 text-sm font-medium hover:bg-slate-800 disabled:opacity-50"
+        className="rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 disabled:opacity-50"
       >
         {guardando ? 'Guardando...' : 'Guardar recepcion'}
       </button>
