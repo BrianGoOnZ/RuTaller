@@ -26,7 +26,16 @@ async function update(req, res, next) {
   try {
     const insumo = await Insumo.findByPk(req.params.id);
     if (!insumo) return res.status(404).json({ message: 'Insumo no encontrado' });
-    await insumo.update(req.body);
+
+    // El stock nunca se edita a mano una vez creado el insumo: solo puede subir
+    // registrando un gasto de compra (Finanzas) o bajar registrando un consumo,
+    // para que el inventario siempre cuadre con el dinero gastado.
+    const camposPermitidos = ['nombre', 'unidad', 'costoPromedio'];
+    const cambios = {};
+    camposPermitidos.forEach((campo) => {
+      if (req.body[campo] !== undefined) cambios[campo] = req.body[campo];
+    });
+    await insumo.update(cambios);
     res.json(insumo);
   } catch (err) {
     next(err);

@@ -219,11 +219,19 @@ export default function InsumosTab() {
               <label className={labelClass}>Unidad</label>
               <input className={inputClass} placeholder="litro, pieza, kg..." value={form.unidad} onChange={(e) => setForm({ ...form, unidad: e.target.value })} />
             </div>
-            <div>
-              <label className={labelClass}>Existencia actual</label>
-              <input type="number" step="0.01" className={inputClass} value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} required />
-            </div>
+            {!editando && (
+              <div>
+                <label className={labelClass}>Existencia inicial</label>
+                <input type="number" step="0.01" className={inputClass} value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} required />
+              </div>
+            )}
           </div>
+          {editando && (
+            <p className="text-xs text-slate-400">
+              Existencia actual: {editando.stock} {editando.unidad}. Ya no se puede editar a mano — sube
+              registrando un gasto de compra en Finanzas, o baja registrando un consumo.
+            </p>
+          )}
           <div>
             <label className={labelClass}>Costo promedio (opcional)</label>
             <input type="number" step="0.01" className={inputClass} value={form.costoPromedio} onChange={(e) => setForm({ ...form, costoPromedio: e.target.value })} />
