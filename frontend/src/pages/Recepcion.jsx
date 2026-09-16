@@ -15,9 +15,11 @@ const btnGhost =
 const btnPrimarySmall =
   'rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800';
 
-function Seccion({ numero, titulo, children }) {
+function Seccion({ numero, titulo, full, children }) {
   return (
-    <section className="space-y-4 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+    <section
+      className={`space-y-4 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-100 ${full ? 'lg:col-span-2' : ''}`}
+    >
       <div className="flex items-center gap-3">
         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">
           {numero}
@@ -147,7 +149,7 @@ export default function Recepcion() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-4xl space-y-6 pb-10">
+    <form onSubmit={handleSubmit} className="max-w-6xl space-y-6 pb-10">
       <div>
         <h1 className="text-2xl font-bold text-slate-800">Recepcion</h1>
         <p className="text-slate-500">Registra el ingreso de una moto al taller.</p>
@@ -158,6 +160,8 @@ export default function Recepcion() {
           {error}
         </p>
       )}
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
       {/* Cliente */}
       <Seccion numero={1} titulo="Cliente">
@@ -328,7 +332,7 @@ export default function Recepcion() {
       )}
 
       {/* Datos de ingreso */}
-      <Seccion numero={3} titulo="Datos de ingreso">
+      <Seccion numero={3} titulo="Datos de ingreso" full>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <div>
             <label className={labelClass}>Fecha de ingreso</label>
@@ -371,8 +375,8 @@ export default function Recepcion() {
       </Seccion>
 
       {/* Checklist */}
-      <Seccion numero={4} titulo="Inventario / checklist de ingreso">
-        <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+      <Seccion numero={4} titulo="Inventario / checklist de ingreso" full>
+        <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2 xl:grid-cols-3">
           {checklist.map((item) => (
             <div key={item.nombre} className="border-b border-slate-100 pb-2">
               <div className="flex items-center justify-between">
@@ -457,6 +461,7 @@ export default function Recepcion() {
           El cliente firmo la hoja fisica de recepcion
         </label>
       </Seccion>
+      </div>
 
       <button
         type="submit"
