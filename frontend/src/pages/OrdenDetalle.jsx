@@ -74,7 +74,7 @@ export default function OrdenDetalle() {
           tipo: 'mano_obra',
           descripcion: descripcionLibre,
           costoUnitario: Number(costoLibre),
-          cantidad: Number(cantidad),
+          cantidad: 1,
         });
         setDescripcionLibre('');
         setCostoLibre('');
@@ -468,7 +468,7 @@ export default function OrdenDetalle() {
           ) : (
             <div className="space-y-3">
               <div>
-                <label className={labelClass}>Descripcion del trabajo</label>
+                <label className={labelClass}>Descripcion del trabajo o servicio</label>
                 <input
                   className={inputClass}
                   placeholder="Ej. Mano de obra - diagnostico electrico"
@@ -476,19 +476,9 @@ export default function OrdenDetalle() {
                   onChange={(e) => setDescripcionLibre(e.target.value)}
                 />
               </div>
-              <div className="grid grid-cols-[100px_140px_1fr_auto] gap-3 items-end">
+              <div className="grid grid-cols-[160px_auto] gap-3 items-end">
                 <div>
-                  <label className={labelClass}>Cantidad</label>
-                  <input
-                    type="number"
-                    min={1}
-                    className={inputClass}
-                    value={cantidad}
-                    onChange={(e) => setCantidad(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>Costo unitario ($)</label>
+                  <label className={labelClass}>Costo ($)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -498,12 +488,6 @@ export default function OrdenDetalle() {
                     onChange={(e) => setCostoLibre(e.target.value)}
                   />
                 </div>
-                <div>
-                  <label className={labelClass}>Importe de esta linea</label>
-                  <p className={`${inputClass} bg-slate-50 text-slate-500`}>
-                    ${(Number(costoLibre || 0) * Number(cantidad || 0)).toFixed(2)}
-                  </p>
-                </div>
                 <button
                   type="submit"
                   className="bg-slate-900 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-slate-800 h-[38px]"
@@ -511,6 +495,9 @@ export default function OrdenDetalle() {
                   Agregar
                 </button>
               </div>
+              <p className="text-xs text-slate-400">
+                ¿Otro servicio o pieza adicional? Agrega otra linea aparte, cada una con su propio costo.
+              </p>
             </div>
           )}
           {errorItem && <p className="text-sm text-red-600">{errorItem}</p>}
