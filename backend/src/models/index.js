@@ -10,6 +10,8 @@ const OrdenServicioItem = require('./OrdenServicioItem');
 const GarantiaEvento = require('./GarantiaEvento');
 const Producto = require('./Producto');
 const Insumo = require('./Insumo');
+const InsumoConsumo = require('./InsumoConsumo');
+const Mecanico = require('./Mecanico');
 const Venta = require('./Venta');
 const VentaItem = require('./VentaItem');
 const Gasto = require('./Gasto');
@@ -52,8 +54,24 @@ VentaItem.belongsTo(Producto, { foreignKey: 'productoId' });
 // Gasto <-> Insumo
 Gasto.belongsTo(Insumo, { foreignKey: 'insumoId' });
 
+// Insumo <-> InsumoConsumo (uso de insumos, ligado a quien lo consumio)
+Insumo.hasMany(InsumoConsumo, { foreignKey: 'insumoId', onDelete: 'CASCADE' });
+InsumoConsumo.belongsTo(Insumo, { foreignKey: 'insumoId' });
+
+Mecanico.hasMany(InsumoConsumo, { foreignKey: 'mecanicoId' });
+InsumoConsumo.belongsTo(Mecanico, { foreignKey: 'mecanicoId' });
+
 async function syncDatabase() {
-  await sequelize.sync({ alter: true });
+  // SQLite exige que las llaves foraneas esten desactivadas mientras se
+  // reconstruyen tablas relacionadas (alter:true), o la migracion falla
+  // (o peor, deja una tabla vacia a medio reconstruir) en cuanto hay filas
+  // que referencian a la tabla que se esta alterando.
+  await sequelize.query('PRAGMA foreign_keys = OFF');
+  try {
+    await sequelize.sync({ alter: true });
+  } finally {
+    await sequelize.query('PRAGMA foreign_keys = ON');
+  }
 
   const existingConfig = await Configuracion.findByPk(1);
   if (!existingConfig) {
@@ -73,6 +91,8 @@ module.exports = {
   GarantiaEvento,
   Producto,
   Insumo,
+  InsumoConsumo,
+  Mecanico,
   Venta,
   VentaItem,
   Gasto,

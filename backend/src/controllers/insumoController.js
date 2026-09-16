@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Insumo } = require('../models');
+const { Insumo, InsumoConsumo, Mecanico } = require('../models');
 
 async function list(req, res, next) {
   try {
@@ -44,4 +44,58 @@ async function remove(req, res, next) {
   }
 }
 
-module.exports = { list, create, update, remove };
+async function listConsumos(req, res, next) {
+  try {
+    const { insumoId, mecanicoId } = req.query;
+    const where = {};
+    if (insumoId) where.insumoId = insumoId;
+    if (mecanicoId) where.mecanicoId = mecanicoId;
+
+    const consumos = await InsumoConsumo.findAll({
+      where,
+      include: [Insumo, Mecanico],
+      order: [['id', 'DESC']],
+    });
+    res.json(consumos);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function registrarConsumo(req, res, next) {
+  try {
+    const insumo = await Insumo.findByPk(req.params.id);
+    if (!insumo) return res.status(404).json({ message: 'Insumo no encontrado' });
+
+    const { cantidad, fecha, mecanicoId, nota } = req.body;
+    const cantidadNum = Number(cantidad);
+    if (!cantidadNum || cantidadNum <= 0) {
+      return res.status(400).json({ message: 'Cantidad invalida' });
+    }
+    if (Number(insumo.stock) < cantidadNum) {
+      return res.status(400).json({ message: 'No hay suficiente existencia de este insumo' });
+    }
+    if (!mecanicoId) {
+      return res.status(400).json({ message: 'Selecciona quien consumio el insumo' });
+    }
+    const mecanico = await Mecanico.findByPk(mecanicoId);
+    if (!mecanico) return res.status(400).json({ message: 'Mecanico invalido' });
+
+    const consumo = await InsumoConsumo.create({
+      insumoId: insumo.id,
+      mecanicoId,
+      cantidad: cantidadNum,
+      fecha: fecha || new Date().toISOString().slice(0, 10),
+      nota: nota || null,
+    });
+
+    await insumo.update({ stock: Number(insumo.stock) - cantidadNum });
+
+    const consumoCompleto = await InsumoConsumo.findByPk(consumo.id, { include: [Insumo, Mecanico] });
+    res.status(201).json(consumoCompleto);
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { list, create, update, remove, listConsumos, registrarConsumo };

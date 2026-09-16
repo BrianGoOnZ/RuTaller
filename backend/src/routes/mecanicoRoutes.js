@@ -1,15 +1,13 @@
 const express = require('express');
 const protect = require('../middlewares/protect');
-const controller = require('../controllers/insumoController');
+const controller = require('../controllers/mecanicoController');
 
 const router = express.Router();
 router.use(protect);
 
 router.get('/', controller.list);
-router.get('/consumos', controller.listConsumos);
 router.post('/', controller.create);
 router.put('/:id', controller.update);
 router.delete('/:id', controller.remove);
-router.post('/:id/consumos', controller.registrarConsumo);
 
 module.exports = router;
