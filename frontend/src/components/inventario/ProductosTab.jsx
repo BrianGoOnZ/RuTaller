@@ -1,9 +1,20 @@
 import { useEffect, useState } from 'react';
 import { listProductos, createProducto, updateProducto, deleteProducto } from '../../services/productos';
 import Modal from '../Modal';
-
-const inputClass = 'w-full border border-slate-300 rounded-md px-3 py-2 text-sm';
-const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
+import { PencilIcon, TrashIcon, PlusIcon } from '../../ui/icons';
+import {
+  inputClass,
+  labelClass,
+  tableWrapClass,
+  theadRowClass,
+  tbodyClass,
+  rowHoverClass,
+  btnPrimary,
+  actionBtnNeutral,
+  actionBtnDanger,
+  avatarInitial,
+  avatarClass,
+} from '../../ui/styles';
 
 const VACIO = { nombre: '', sku: '', categoria: '', precioCompra: '', precioVenta: '', stock: '', stockMinimo: '' };
 
@@ -65,49 +76,55 @@ export default function ProductosTab() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
-        <button
-          onClick={abrirNuevo}
-          className="bg-slate-900 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-slate-800"
-        >
-          + Nuevo producto
+        <button onClick={abrirNuevo} className={`${btnPrimary} inline-flex items-center gap-1.5`}>
+          <PlusIcon width={16} height={16} /> Nuevo producto
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className={tableWrapClass}>
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-slate-500 text-left">
-            <tr>
-              <th className="px-4 py-2">Nombre</th>
-              <th className="px-4 py-2">Categoria</th>
-              <th className="px-4 py-2">Precio compra</th>
-              <th className="px-4 py-2">Precio venta</th>
-              <th className="px-4 py-2">Stock</th>
-              <th className="px-4 py-2"></th>
+          <thead>
+            <tr className={theadRowClass}>
+              <th className="px-5 py-3">Producto</th>
+              <th className="px-5 py-3">Categoria</th>
+              <th className="px-5 py-3">Precio compra</th>
+              <th className="px-5 py-3">Precio venta</th>
+              <th className="px-5 py-3">Stock</th>
+              <th className="px-5 py-3 text-right">Acciones</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className={tbodyClass}>
             {productos.map((p) => (
-              <tr key={p.id} className="border-t border-slate-100 hover:bg-slate-50">
-                <td className="px-4 py-2 font-medium">{p.nombre}</td>
-                <td className="px-4 py-2">{p.categoria}</td>
-                <td className="px-4 py-2">${Number(p.precioCompra).toFixed(2)}</td>
-                <td className="px-4 py-2">${Number(p.precioVenta).toFixed(2)}</td>
-                <td className={`px-4 py-2 ${p.stockMinimo && p.stock <= p.stockMinimo ? 'text-red-600 font-semibold' : ''}`}>
+              <tr key={p.id} className={rowHoverClass}>
+                <td className="px-5 py-3">
+                  <div className="flex items-center gap-3">
+                    <div className={avatarClass}>{avatarInitial(p.nombre)}</div>
+                    <span className="font-medium text-slate-800">{p.nombre}</span>
+                  </div>
+                </td>
+                <td className="px-5 py-3 text-slate-600">{p.categoria || '-'}</td>
+                <td className="px-5 py-3 text-slate-600">${Number(p.precioCompra).toFixed(2)}</td>
+                <td className="px-5 py-3 text-slate-600">${Number(p.precioVenta).toFixed(2)}</td>
+                <td
+                  className={`px-5 py-3 ${p.stockMinimo && p.stock <= p.stockMinimo ? 'font-semibold text-red-600' : 'text-slate-600'}`}
+                >
                   {p.stock}
                 </td>
-                <td className="px-4 py-2 text-right space-x-3">
-                  <button className="text-slate-500 hover:text-slate-800" onClick={() => abrirEditar(p)}>
-                    Editar
-                  </button>
-                  <button className="text-red-500 hover:text-red-700" onClick={() => handleDelete(p)}>
-                    Desactivar
-                  </button>
+                <td className="px-5 py-3">
+                  <div className="flex items-center justify-end gap-2">
+                    <button onClick={() => abrirEditar(p)} className={actionBtnNeutral}>
+                      <PencilIcon /> Editar
+                    </button>
+                    <button onClick={() => handleDelete(p)} className={actionBtnDanger}>
+                      <TrashIcon /> Desactivar
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
             {productos.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-slate-400">
+                <td colSpan={6} className="px-5 py-8 text-center text-slate-400">
                   Sin productos registrados
                 </td>
               </tr>
@@ -152,7 +169,7 @@ export default function ProductosTab() {
               <input type="number" className={inputClass} value={form.stockMinimo} onChange={(e) => setForm({ ...form, stockMinimo: e.target.value })} />
             </div>
           </div>
-          <button type="submit" className="w-full bg-slate-900 text-white rounded-md py-2 text-sm font-medium hover:bg-slate-800">
+          <button type="submit" className={`${btnPrimary} w-full`}>
             Guardar
           </button>
         </form>

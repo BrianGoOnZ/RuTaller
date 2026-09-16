@@ -9,9 +9,22 @@ import {
 } from '../../services/insumos';
 import { listMecanicos, createMecanico } from '../../services/mecanicos';
 import Modal from '../Modal';
-
-const inputClass = 'w-full border border-slate-300 rounded-md px-3 py-2 text-sm';
-const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
+import { PencilIcon, TrashIcon, PlusIcon, ClipboardIcon } from '../../ui/icons';
+import {
+  inputClass,
+  labelClass,
+  tableWrapClass,
+  theadRowClass,
+  tbodyClass,
+  rowHoverClass,
+  btnPrimary,
+  btnGhost,
+  actionBtnNeutral,
+  actionBtnDanger,
+  actionBtnAmber,
+  avatarInitial,
+  avatarClass,
+} from '../../ui/styles';
 
 const VACIO = { nombre: '', unidad: 'pieza', stock: '', costoPromedio: '' };
 const VACIO_CONSUMO = { cantidad: '', fecha: new Date().toISOString().slice(0, 10), nota: '', mecanicoId: '' };
@@ -120,11 +133,8 @@ export default function InsumosTab() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
-        <button
-          onClick={abrirNuevo}
-          className="bg-slate-900 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-slate-800"
-        >
-          + Nuevo insumo
+        <button onClick={abrirNuevo} className={`${btnPrimary} inline-flex items-center gap-1.5`}>
+          <PlusIcon width={16} height={16} /> Nuevo insumo
         </button>
       </div>
 
@@ -133,38 +143,45 @@ export default function InsumosTab() {
         de compra en Finanzas, y baja cuando registras aqui lo que se va consumiendo en los trabajos.
       </p>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+      <div className={`${tableWrapClass} mb-6`}>
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-slate-500 text-left">
-            <tr>
-              <th className="px-4 py-2">Nombre</th>
-              <th className="px-4 py-2">Unidad</th>
-              <th className="px-4 py-2">Existencia</th>
-              <th className="px-4 py-2"></th>
+          <thead>
+            <tr className={theadRowClass}>
+              <th className="px-5 py-3">Insumo</th>
+              <th className="px-5 py-3">Unidad</th>
+              <th className="px-5 py-3">Existencia</th>
+              <th className="px-5 py-3 text-right">Acciones</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className={tbodyClass}>
             {insumos.map((i) => (
-              <tr key={i.id} className="border-t border-slate-100 hover:bg-slate-50">
-                <td className="px-4 py-2 font-medium">{i.nombre}</td>
-                <td className="px-4 py-2">{i.unidad}</td>
-                <td className="px-4 py-2">{i.stock}</td>
-                <td className="px-4 py-2 text-right space-x-3">
-                  <button className="text-amber-700 hover:text-amber-900" onClick={() => abrirConsumo(i)}>
-                    Registrar consumo
-                  </button>
-                  <button className="text-slate-500 hover:text-slate-800" onClick={() => abrirEditar(i)}>
-                    Editar
-                  </button>
-                  <button className="text-red-500 hover:text-red-700" onClick={() => handleDelete(i)}>
-                    Desactivar
-                  </button>
+              <tr key={i.id} className={rowHoverClass}>
+                <td className="px-5 py-3">
+                  <div className="flex items-center gap-3">
+                    <div className={avatarClass}>{avatarInitial(i.nombre)}</div>
+                    <span className="font-medium text-slate-800">{i.nombre}</span>
+                  </div>
+                </td>
+                <td className="px-5 py-3 text-slate-600">{i.unidad}</td>
+                <td className="px-5 py-3 text-slate-600">{i.stock}</td>
+                <td className="px-5 py-3">
+                  <div className="flex items-center justify-end gap-2">
+                    <button onClick={() => abrirConsumo(i)} className={actionBtnAmber}>
+                      <ClipboardIcon /> Registrar consumo
+                    </button>
+                    <button onClick={() => abrirEditar(i)} className={actionBtnNeutral}>
+                      <PencilIcon /> Editar
+                    </button>
+                    <button onClick={() => handleDelete(i)} className={actionBtnDanger}>
+                      <TrashIcon /> Desactivar
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
             {insumos.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-slate-400">
+                <td colSpan={4} className="px-5 py-8 text-center text-slate-400">
                   Sin insumos registrados
                 </td>
               </tr>
@@ -173,33 +190,33 @@ export default function InsumosTab() {
         </table>
       </div>
 
-      <h2 className="text-lg font-semibold text-slate-700 mb-2">Consumos recientes</h2>
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <h2 className="mb-2 text-lg font-semibold text-slate-700">Consumos recientes</h2>
+      <div className={tableWrapClass}>
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-slate-500 text-left">
-            <tr>
-              <th className="px-4 py-2">Fecha</th>
-              <th className="px-4 py-2">Insumo</th>
-              <th className="px-4 py-2">Cantidad</th>
-              <th className="px-4 py-2">Mecanico</th>
-              <th className="px-4 py-2">Nota</th>
+          <thead>
+            <tr className={theadRowClass}>
+              <th className="px-5 py-3">Fecha</th>
+              <th className="px-5 py-3">Insumo</th>
+              <th className="px-5 py-3">Cantidad</th>
+              <th className="px-5 py-3">Mecanico</th>
+              <th className="px-5 py-3">Nota</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className={tbodyClass}>
             {consumos.slice(0, 10).map((c) => (
-              <tr key={c.id} className="border-t border-slate-100">
-                <td className="px-4 py-2">{c.fecha}</td>
-                <td className="px-4 py-2">{c.Insumo?.nombre}</td>
-                <td className="px-4 py-2">
+              <tr key={c.id} className={rowHoverClass}>
+                <td className="px-5 py-3 text-slate-600">{c.fecha}</td>
+                <td className="px-5 py-3 text-slate-600">{c.Insumo?.nombre}</td>
+                <td className="px-5 py-3 text-slate-600">
                   {c.cantidad} {c.Insumo?.unidad}
                 </td>
-                <td className="px-4 py-2">{c.Mecanico?.nombre || '-'}</td>
-                <td className="px-4 py-2">{c.nota || '-'}</td>
+                <td className="px-5 py-3 text-slate-600">{c.Mecanico?.nombre || '-'}</td>
+                <td className="px-5 py-3 text-slate-600">{c.nota || '-'}</td>
               </tr>
             ))}
             {consumos.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-slate-400">
+                <td colSpan={5} className="px-5 py-8 text-center text-slate-400">
                   Sin consumos registrados
                 </td>
               </tr>
@@ -236,7 +253,7 @@ export default function InsumosTab() {
             <label className={labelClass}>Costo promedio (opcional)</label>
             <input type="number" step="0.01" className={inputClass} value={form.costoPromedio} onChange={(e) => setForm({ ...form, costoPromedio: e.target.value })} />
           </div>
-          <button type="submit" className="w-full bg-slate-900 text-white rounded-md py-2 text-sm font-medium hover:bg-slate-800">
+          <button type="submit" className={`${btnPrimary} w-full`}>
             Guardar
           </button>
         </form>
@@ -262,18 +279,10 @@ export default function InsumosTab() {
                   value={nuevoMecanicoNombre}
                   onChange={(e) => setNuevoMecanicoNombre(e.target.value)}
                 />
-                <button
-                  type="button"
-                  onClick={handleCrearMecanico}
-                  className="bg-slate-900 text-white rounded-md px-3 text-sm font-medium"
-                >
+                <button type="button" onClick={handleCrearMecanico} className={btnPrimary}>
                   Guardar
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setNuevoMecanicoOpen(false)}
-                  className="text-sm text-slate-500"
-                >
+                <button type="button" onClick={() => setNuevoMecanicoOpen(false)} className={btnGhost}>
                   Cancelar
                 </button>
               </div>
@@ -292,11 +301,7 @@ export default function InsumosTab() {
                     </option>
                   ))}
                 </select>
-                <button
-                  type="button"
-                  onClick={() => setNuevoMecanicoOpen(true)}
-                  className="text-sm text-slate-500 hover:underline whitespace-nowrap"
-                >
+                <button type="button" onClick={() => setNuevoMecanicoOpen(true)} className={`${btnGhost} whitespace-nowrap`}>
                   + Nuevo
                 </button>
               </div>
@@ -335,7 +340,10 @@ export default function InsumosTab() {
             />
           </div>
           {errorConsumo && <p className="text-sm text-red-600">{errorConsumo}</p>}
-          <button type="submit" className="w-full bg-amber-600 text-white rounded-md py-2 text-sm font-medium hover:bg-amber-700">
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-amber-700"
+          >
             Registrar consumo
           </button>
         </form>

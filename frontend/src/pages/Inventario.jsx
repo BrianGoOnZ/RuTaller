@@ -3,6 +3,7 @@ import ProductosTab from '../components/inventario/ProductosTab';
 import InsumosTab from '../components/inventario/InsumosTab';
 import VentaRapidaTab from '../components/inventario/VentaRapidaTab';
 import MecanicosTab from '../components/inventario/MecanicosTab';
+import { segmentedWrapClass, segmentedTabClass } from '../ui/styles';
 
 const TABS = [
   { id: 'productos', label: 'Productos' },
@@ -18,15 +19,9 @@ export default function Inventario() {
     <div>
       <h1 className="text-2xl font-bold text-slate-800 mb-4">Inventario</h1>
 
-      <div className="flex gap-2 mb-4 border-b border-slate-200">
+      <div className={`${segmentedWrapClass} mb-5`}>
         {TABS.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
-              tab === t.id ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-500'
-            }`}
-          >
+          <button key={t.id} onClick={() => setTab(t.id)} className={segmentedTabClass(tab === t.id)}>
             {t.label}
           </button>
         ))}

@@ -16,10 +16,17 @@ import SearchSelect from '../components/SearchSelect';
 import EstadoAutoGuardado from '../components/EstadoAutoGuardado';
 import GarantiaEventoCard from '../components/GarantiaEventoCard';
 import useAutoSaveTexto from '../hooks/useAutoSaveTexto';
-
-const inputClass = 'w-full border border-slate-300 rounded-md px-3 py-2 text-sm';
-const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
-const cardClass = 'bg-white rounded-lg shadow-sm p-5 space-y-4';
+import { TrashIcon, UploadIcon, PlusIcon } from '../ui/icons';
+import {
+  inputClass,
+  labelClass,
+  cardClass,
+  btnPrimary,
+  btnPrimarySmall,
+  btnGhost,
+  btnDanger,
+  badgePill,
+} from '../ui/styles';
 
 export default function OrdenDetalle() {
   const { id } = useParams();
@@ -151,23 +158,23 @@ export default function OrdenDetalle() {
   const puedeAbrirGarantia = !!orden.fechaEntregaReal && !garantiaAbierta;
 
   return (
-    <div className="max-w-4xl space-y-6 pb-10">
+    <div className="max-w-5xl space-y-6 pb-10">
       <div>
-        <Link to="/servicios" className="text-sm text-slate-500 hover:underline">
+        <Link to="/servicios" className="text-sm text-slate-500 hover:text-slate-700">
           &larr; Servicios
         </Link>
-        <div className="flex items-center justify-between mt-2">
+        <div className="mt-2 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">
               Orden #{orden.id} - {orden.Moto?.marca} {orden.Moto?.modelo}
             </h1>
-            <p className="text-slate-500 text-sm">
+            <p className="text-sm text-slate-500">
               {orden.Moto?.Cliente?.nombre} · Placas: {orden.Moto?.placas || 'N/A'}
             </p>
           </div>
           <div className="flex items-center gap-2">
             {orden.estado === 'garantia' ? (
-              <span className="px-3 py-2 text-sm bg-amber-100 text-amber-800 rounded-md w-56 text-center">
+              <span className={`${badgePill} bg-amber-100 text-amber-800 w-56 text-center`}>
                 Reabierta por garantia
               </span>
             ) : (
@@ -183,446 +190,426 @@ export default function OrdenDetalle() {
                 ))}
               </select>
             )}
-            <button
-              type="button"
-              onClick={handleEliminarOrden}
-              className="text-sm text-red-500 hover:text-red-700"
-              title="Eliminar esta orden por completo"
-            >
-              Eliminar
+            <button onClick={handleEliminarOrden} className={`${btnDanger} inline-flex items-center gap-1.5`}>
+              <TrashIcon /> Eliminar
             </button>
           </div>
         </div>
         {orden.GarantiaEventos?.length > 0 && (
-          <p className="text-sm text-amber-700 mt-2">
+          <p className="mt-2 text-sm text-amber-700">
             {orden.GarantiaEventos.length} reingreso(s) por garantia registrado(s) (ver abajo)
           </p>
         )}
       </div>
 
-      {/* Datos de ingreso */}
-      <section className={cardClass}>
-        <h2 className="font-semibold text-slate-700">Datos de ingreso</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div>
-            <p className="text-slate-400">Fecha</p>
-            <p>{orden.fechaIngreso}</p>
-          </div>
-          <div>
-            <p className="text-slate-400">Hora</p>
-            <p>{orden.horaIngreso || '-'}</p>
-          </div>
-          <div>
-            <p className="text-slate-400">Entrega estimada</p>
-            <p>{orden.fechaEntregaEstimada || '-'}</p>
-          </div>
-          <div>
-            <p className="text-slate-400">Kilometraje</p>
-            <p>{orden.kilometraje || '-'}</p>
-          </div>
-          <div>
-            <p className="text-slate-400">Nivel gasolina</p>
-            <p>{orden.nivelGasolina || '-'}</p>
-          </div>
-          <div>
-            <p className="text-slate-400">Nivel aceite</p>
-            <p>{orden.nivelAceite || '-'}</p>
-          </div>
-          <div>
-            <p className="text-slate-400">Firma de recepcion</p>
-            <p>{orden.firmaClienteRecepcion ? 'Si' : 'No'}</p>
-          </div>
-        </div>
-        <div>
-          <p className="text-slate-400 text-sm">Trabajo solicitado</p>
-          <p className="text-sm">{orden.trabajoSolicitado || '-'}</p>
-        </div>
-      </section>
-
-      {/* Checklist */}
-      <section className={cardClass}>
-        <h2 className="font-semibold text-slate-700">Inventario / checklist de ingreso</h2>
-        <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1 text-sm">
-          {orden.OrdenServicioChecklistItems?.map((item) => (
-            <div key={item.id} className="flex items-center justify-between border-b border-slate-100 py-1">
-              <span className="text-slate-600">{item.nombre}</span>
-              <span
-                className={
-                  item.estado === 'bien'
-                    ? 'text-green-600'
-                    : item.estado === 'detalle'
-                      ? 'text-amber-600'
-                      : 'text-slate-300'
-                }
-              >
-                {item.estado === 'bien' ? 'Bien' : item.estado === 'detalle' ? item.nota || 'Detalle' : '-'}
-              </span>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Datos de ingreso */}
+        <section className={`${cardClass} space-y-4`}>
+          <h2 className="font-semibold text-slate-800">Datos de ingreso</h2>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-slate-400">Fecha</p>
+              <p className="text-slate-700">{orden.fechaIngreso}</p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Fotos */}
-      <section className={cardClass}>
-        <h2 className="font-semibold text-slate-700">Fotos</h2>
-        <div className="flex flex-wrap gap-3">
-          {orden.OrdenServicioFotos?.map((foto) => (
-            <div key={foto.id} className="relative">
-              <img
-                src={`http://localhost:4000/uploads/${foto.path}`}
-                alt="Foto de la moto"
-                className="w-28 h-28 object-cover rounded-md"
-              />
-              <button
-                type="button"
-                onClick={() => handleEliminarFoto(foto.id)}
-                className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 text-xs"
-              >
-                &times;
-              </button>
+            <div>
+              <p className="text-slate-400">Hora</p>
+              <p className="text-slate-700">{orden.horaIngreso || '-'}</p>
             </div>
-          ))}
-        </div>
-        <input type="file" accept="image/*" onChange={handleFoto} />
-      </section>
+            <div>
+              <p className="text-slate-400">Entrega estimada</p>
+              <p className="text-slate-700">{orden.fechaEntregaEstimada || '-'}</p>
+            </div>
+            <div>
+              <p className="text-slate-400">Kilometraje</p>
+              <p className="text-slate-700">{orden.kilometraje || '-'}</p>
+            </div>
+            <div>
+              <p className="text-slate-400">Nivel gasolina</p>
+              <p className="text-slate-700">{orden.nivelGasolina || '-'}</p>
+            </div>
+            <div>
+              <p className="text-slate-400">Nivel aceite</p>
+              <p className="text-slate-700">{orden.nivelAceite || '-'}</p>
+            </div>
+            <div>
+              <p className="text-slate-400">Firma de recepcion</p>
+              <p className="text-slate-700">{orden.firmaClienteRecepcion ? 'Si' : 'No'}</p>
+            </div>
+          </div>
+          <div>
+            <p className="text-sm text-slate-400">Trabajo solicitado</p>
+            <p className="text-sm text-slate-700">{orden.trabajoSolicitado || '-'}</p>
+          </div>
+        </section>
 
-      {/* Diagnostico */}
-      <section className={cardClass}>
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-slate-700">Diagnostico</h2>
-          <EstadoAutoGuardado estado={diagnosticoAuto.estadoGuardado} />
-        </div>
-        <textarea
-          className={`${inputClass} min-h-24`}
-          placeholder="Que encontro el mecanico al revisar la moto..."
-          value={diagnosticoAuto.valor}
-          onChange={(e) => diagnosticoAuto.onChange(e.target.value)}
-        />
-        <p className="text-xs text-slate-400">Se guarda solo mientras escribes.</p>
-      </section>
-
-      {/* Presupuesto */}
-      <section className={cardClass}>
-        <h2 className="font-semibold text-slate-700">Presupuesto</h2>
-
-        <table className="w-full text-sm">
-          <thead className="text-slate-500 text-left">
-            <tr>
-              <th className="py-1">Descripcion</th>
-              <th className="py-1">Cant.</th>
-              <th className="py-1">Costo unit.</th>
-              <th className="py-1">Importe</th>
-              <th className="py-1"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {orden.OrdenServicioItems?.map((item) => (
-              <tr key={item.id} className="border-t border-slate-100">
-                <td className="py-2">
-                  {item.descripcion}
-                  {item.tipo === 'producto' && (
-                    <span className="text-xs text-slate-400"> (producto)</span>
-                  )}
-                </td>
-                <td className="py-2">{item.cantidad}</td>
-                <td className="py-2">${Number(item.costoUnitario).toFixed(2)}</td>
-                <td className="py-2">${Number(item.importe).toFixed(2)}</td>
-                <td className="py-2 text-right">
-                  <button
-                    type="button"
-                    className="text-red-500 hover:text-red-700 text-xs"
-                    onClick={() => handleEliminarItem(item.id)}
-                  >
-                    Quitar
-                  </button>
-                </td>
-              </tr>
+        {/* Fotos */}
+        <section className={`${cardClass} space-y-4`}>
+          <h2 className="font-semibold text-slate-800">Fotos</h2>
+          <div className="flex flex-wrap gap-3">
+            {orden.OrdenServicioFotos?.map((foto) => (
+              <div key={foto.id} className="relative">
+                <img
+                  src={`http://localhost:4000/uploads/${foto.path}`}
+                  alt="Foto de la moto"
+                  className="h-28 w-28 rounded-lg object-cover ring-1 ring-slate-100"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleEliminarFoto(foto.id)}
+                  className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs text-white shadow-sm transition-colors hover:bg-red-700"
+                  aria-label="Eliminar foto"
+                >
+                  &times;
+                </button>
+              </div>
             ))}
-          </tbody>
-        </table>
-
-        <div className="flex justify-end text-sm space-y-1">
-          <div className="w-48 space-y-1">
-            <div className="flex justify-between">
-              <span className="text-slate-500">Subtotal</span>
-              <span>${Number(orden.subtotal).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-500">IVA</span>
-              <span>${Number(orden.ivaMonto).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between font-semibold">
-              <span>Total</span>
-              <span>${Number(orden.total).toFixed(2)}</span>
-            </div>
           </div>
-        </div>
+          <label className={`${btnGhost} inline-flex cursor-pointer items-center gap-1.5`}>
+            <UploadIcon width={14} height={14} /> Agregar foto
+            <input type="file" accept="image/*" onChange={handleFoto} className="hidden" />
+          </label>
+        </section>
 
-        <form onSubmit={handleAgregarItem} className="border-t border-slate-200 pt-4 space-y-4">
-          <div>
-            <label className={labelClass}>Tipo de linea</label>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setTipoItem('producto')}
-                className={`px-3 py-1.5 text-xs rounded-md border ${tipoItem === 'producto' ? 'bg-slate-900 text-white border-slate-900' : 'border-slate-300 text-slate-600'}`}
-              >
-                Producto de inventario
-              </button>
-              <button
-                type="button"
-                onClick={() => setTipoItem('mano_obra')}
-                className={`px-3 py-1.5 text-xs rounded-md border ${tipoItem === 'mano_obra' ? 'bg-slate-900 text-white border-slate-900' : 'border-slate-300 text-slate-600'}`}
-              >
-                Mano de obra / libre
-              </button>
-            </div>
-          </div>
-
-          {tipoItem === 'producto' ? (
-            <div className="space-y-3">
-              <div>
-                <label className={labelClass}>Producto</label>
-                {productoSel ? (
-                  <div className="flex items-center justify-between bg-slate-50 rounded-md px-3 py-2 text-sm">
-                    <span>
-                      {productoSel.nombre} · ${Number(productoSel.precioVenta).toFixed(2)} c/u (stock: {productoSel.stock})
-                    </span>
-                    <button type="button" className="text-slate-500" onClick={() => setProductoSel(null)}>
-                      Cambiar
-                    </button>
-                  </div>
-                ) : productoNuevoOpen ? (
-                  <div className="space-y-2 bg-slate-50 rounded-md p-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className={labelClass}>Nombre del producto</label>
-                        <input
-                          className={inputClass}
-                          value={productoNuevo.nombre}
-                          onChange={(e) => setProductoNuevo({ ...productoNuevo, nombre: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <label className={labelClass}>Precio de compra ($)</label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          className={inputClass}
-                          value={productoNuevo.precioCompra}
-                          onChange={(e) => setProductoNuevo({ ...productoNuevo, precioCompra: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <label className={labelClass}>Precio de venta ($)</label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          className={inputClass}
-                          value={productoNuevo.precioVenta}
-                          onChange={(e) => setProductoNuevo({ ...productoNuevo, precioVenta: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <label className={labelClass}>Stock inicial</label>
-                        <input
-                          type="number"
-                          className={inputClass}
-                          value={productoNuevo.stock}
-                          onChange={(e) => setProductoNuevo({ ...productoNuevo, stock: e.target.value })}
-                        />
-                      </div>
-                    </div>
-                    <div className="flex gap-3">
-                      <button
-                        type="button"
-                        onClick={handleCrearProductoRapido}
-                        className="bg-slate-900 text-white rounded-md px-3 py-1.5 text-xs font-medium"
-                      >
-                        Guardar y usar
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setProductoNuevoOpen(false)}
-                        className="text-xs text-slate-500"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-1">
-                    <SearchSelect
-                      placeholder="Escribe el nombre del producto..."
-                      onSearch={listProductos}
-                      renderItem={(p) => (
-                        <>
-                          <p className="font-medium">{p.nombre}</p>
-                          <p className="text-xs text-slate-500">
-                            ${Number(p.precioVenta).toFixed(2)} · stock: {p.stock}
-                          </p>
-                        </>
-                      )}
-                      onSelect={setProductoSel}
-                    />
-                    <button
-                      type="button"
-                      className="text-xs text-slate-500 hover:underline"
-                      onClick={() => setProductoNuevoOpen(true)}
-                    >
-                      No existe, registrar producto nuevo
-                    </button>
-                  </div>
+        {/* Checklist */}
+        <section className={`${cardClass} space-y-4 lg:col-span-2`}>
+          <h2 className="font-semibold text-slate-800">Inventario / checklist de ingreso</h2>
+          <div className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2 xl:grid-cols-3">
+            {orden.OrdenServicioChecklistItems?.map((item) => (
+              <div key={item.id} className="flex items-center justify-between border-b border-slate-100 py-1.5">
+                <span className="text-slate-600">{item.nombre}</span>
+                {item.estado === 'bien' && <span className={`${badgePill} bg-green-100 text-green-700`}>Bien</span>}
+                {item.estado === 'detalle' && (
+                  <span className={`${badgePill} bg-amber-100 text-amber-700`}>{item.nota || 'Detalle'}</span>
                 )}
+                {!item.estado && <span className="text-slate-300">-</span>}
               </div>
+            ))}
+          </div>
+        </section>
 
-              <div className="grid grid-cols-[100px_1fr_auto] gap-3 items-end">
-                <div>
-                  <label className={labelClass}>Cantidad</label>
-                  <input
-                    type="number"
-                    min={1}
-                    className={inputClass}
-                    value={cantidad}
-                    onChange={(e) => setCantidad(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>Importe de esta linea</label>
-                  <p className={`${inputClass} bg-slate-50 text-slate-500`}>
-                    {productoSel
-                      ? `$${(Number(productoSel.precioVenta) * Number(cantidad || 0)).toFixed(2)}`
-                      : 'Selecciona un producto...'}
-                  </p>
-                </div>
-                <button
-                  type="submit"
-                  className="bg-slate-900 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-slate-800 h-[38px]"
-                >
-                  Agregar
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div>
-                <label className={labelClass}>Descripcion del trabajo o servicio</label>
-                <input
-                  className={inputClass}
-                  placeholder="Ej. Mano de obra - diagnostico electrico"
-                  value={descripcionLibre}
-                  onChange={(e) => setDescripcionLibre(e.target.value)}
-                />
-              </div>
-              <div className="grid grid-cols-[160px_auto] gap-3 items-end">
-                <div>
-                  <label className={labelClass}>Costo ($)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    className={inputClass}
-                    placeholder="0.00"
-                    value={costoLibre}
-                    onChange={(e) => setCostoLibre(e.target.value)}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="bg-slate-900 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-slate-800 h-[38px]"
-                >
-                  Agregar
-                </button>
-              </div>
-              <p className="text-xs text-slate-400">
-                ¿Otro servicio o pieza adicional? Agrega otra linea aparte, cada una con su propio costo.
-              </p>
-            </div>
-          )}
-          {errorItem && <p className="text-sm text-red-600">{errorItem}</p>}
-        </form>
-      </section>
-
-      {/* Entrega */}
-      <section className={cardClass}>
-        <h2 className="font-semibold text-slate-700">Entrega</h2>
-        {orden.fechaEntregaReal ? (
-          <p className="text-sm text-slate-600">
-            Entregada el {orden.fechaEntregaReal}. Firma de conformidad:{' '}
-            {orden.firmaClienteEntrega ? 'Si' : 'No'}.
-          </p>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className={labelClass}>Fecha de entrega real</label>
-                <input
-                  type="date"
-                  className={inputClass}
-                  value={fechaEntregaReal}
-                  onChange={(e) => setFechaEntregaReal(e.target.value)}
-                />
-              </div>
-              <label className="flex items-center gap-2 mt-6 text-sm text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={firmaClienteEntrega}
-                  onChange={(e) => setFirmaClienteEntrega(e.target.checked)}
-                />
-                El cliente firmo de conformidad al recibir su moto
-              </label>
-            </div>
-            {errorEntrega && <p className="text-sm text-red-600">{errorEntrega}</p>}
-            <button
-              type="button"
-              onClick={guardarEntrega}
-              disabled={guardandoEntrega}
-              className="bg-green-700 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-green-800 disabled:opacity-50"
-            >
-              {guardandoEntrega ? 'Guardando...' : 'Marcar como entregada'}
-            </button>
-          </>
-        )}
-      </section>
-
-      {/* Garantias */}
-      {orden.fechaEntregaReal && (
-        <section className={cardClass}>
+        {/* Diagnostico */}
+        <section className={`${cardClass} space-y-4`}>
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-slate-700">Garantias de esta orden</h2>
-            {puedeAbrirGarantia && (
+            <h2 className="font-semibold text-slate-800">Diagnostico</h2>
+            <EstadoAutoGuardado estado={diagnosticoAuto.estadoGuardado} />
+          </div>
+          <textarea
+            className={`${inputClass} min-h-24`}
+            placeholder="Que encontro el mecanico al revisar la moto..."
+            value={diagnosticoAuto.valor}
+            onChange={(e) => diagnosticoAuto.onChange(e.target.value)}
+          />
+          <p className="text-xs text-slate-400">Se guarda solo mientras escribes.</p>
+        </section>
+
+        {/* Entrega */}
+        <section className={`${cardClass} space-y-4`}>
+          <h2 className="font-semibold text-slate-800">Entrega</h2>
+          {orden.fechaEntregaReal ? (
+            <p className="text-sm text-slate-600">
+              Entregada el {orden.fechaEntregaReal}. Firma de conformidad:{' '}
+              {orden.firmaClienteEntrega ? 'Si' : 'No'}.
+            </p>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Fecha de entrega real</label>
+                  <input
+                    type="date"
+                    className={inputClass}
+                    value={fechaEntregaReal}
+                    onChange={(e) => setFechaEntregaReal(e.target.value)}
+                  />
+                </div>
+                <label className="mt-6 flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={firmaClienteEntrega}
+                    onChange={(e) => setFirmaClienteEntrega(e.target.checked)}
+                    className="h-4 w-4 rounded border-slate-300"
+                  />
+                  El cliente firmo de conformidad al recibir su moto
+                </label>
+              </div>
+              {errorEntrega && <p className="text-sm text-red-600">{errorEntrega}</p>}
               <button
                 type="button"
-                onClick={handleAbrirGarantia}
-                className="bg-amber-600 text-white rounded-md px-3 py-1.5 text-sm font-medium hover:bg-amber-700"
+                onClick={guardarEntrega}
+                disabled={guardandoEntrega}
+                className="rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-green-800 disabled:opacity-50"
               >
-                + El cliente regreso por garantia
+                {guardandoEntrega ? 'Guardando...' : 'Marcar como entregada'}
               </button>
-            )}
-          </div>
-
-          {orden.GarantiaEventos?.length > 0 ? (
-            <>
-              <div className="bg-slate-50 rounded-md p-3">
-                <p className="text-xs text-slate-400 mb-1">Diagnostico original (primera visita):</p>
-                <p className="text-sm text-slate-600">{orden.diagnostico || 'Sin diagnostico registrado.'}</p>
-              </div>
-              <div className="space-y-4">
-                {orden.GarantiaEventos.map((evento, idx) => (
-                  <GarantiaEventoCard
-                    key={evento.id}
-                    ordenId={id}
-                    evento={evento}
-                    numero={idx + 1}
-                    onChange={cargar}
-                  />
-                ))}
-              </div>
             </>
-          ) : (
-            <p className="text-sm text-slate-400">Esta moto no ha regresado por garantia.</p>
           )}
         </section>
-      )}
+
+        {/* Presupuesto */}
+        <section className={`${cardClass} space-y-4 lg:col-span-2`}>
+          <h2 className="font-semibold text-slate-800">Presupuesto</h2>
+
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="py-1.5">Descripcion</th>
+                <th className="py-1.5">Cant.</th>
+                <th className="py-1.5">Costo unit.</th>
+                <th className="py-1.5">Importe</th>
+                <th className="py-1.5"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {orden.OrdenServicioItems?.map((item) => (
+                <tr key={item.id}>
+                  <td className="py-2 text-slate-700">
+                    {item.descripcion}
+                    {item.tipo === 'producto' && <span className="text-xs text-slate-400"> (producto)</span>}
+                  </td>
+                  <td className="py-2 text-slate-600">{item.cantidad}</td>
+                  <td className="py-2 text-slate-600">${Number(item.costoUnitario).toFixed(2)}</td>
+                  <td className="py-2 text-slate-600">${Number(item.importe).toFixed(2)}</td>
+                  <td className="py-2 text-right">
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-50 hover:text-red-700"
+                      onClick={() => handleEliminarItem(item.id)}
+                    >
+                      <TrashIcon width={13} height={13} /> Quitar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className="flex justify-end">
+            <div className="w-48 space-y-1 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-500">Subtotal</span>
+                <span className="text-slate-700">${Number(orden.subtotal).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">IVA</span>
+                <span className="text-slate-700">${Number(orden.ivaMonto).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between font-semibold text-slate-800">
+                <span>Total</span>
+                <span>${Number(orden.total).toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          <form onSubmit={handleAgregarItem} className="space-y-4 border-t border-slate-100 pt-4">
+            <div>
+              <label className={labelClass}>Tipo de linea</label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setTipoItem('producto')}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${tipoItem === 'producto' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                >
+                  Producto de inventario
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTipoItem('mano_obra')}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${tipoItem === 'mano_obra' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                >
+                  Mano de obra / libre
+                </button>
+              </div>
+            </div>
+
+            {tipoItem === 'producto' ? (
+              <div className="space-y-3">
+                <div>
+                  <label className={labelClass}>Producto</label>
+                  {productoSel ? (
+                    <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm">
+                      <span>
+                        {productoSel.nombre} · ${Number(productoSel.precioVenta).toFixed(2)} c/u (stock: {productoSel.stock})
+                      </span>
+                      <button type="button" className={btnGhost} onClick={() => setProductoSel(null)}>
+                        Cambiar
+                      </button>
+                    </div>
+                  ) : productoNuevoOpen ? (
+                    <div className="space-y-2 rounded-lg bg-slate-50 p-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className={labelClass}>Nombre del producto</label>
+                          <input
+                            className={inputClass}
+                            value={productoNuevo.nombre}
+                            onChange={(e) => setProductoNuevo({ ...productoNuevo, nombre: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <label className={labelClass}>Precio de compra ($)</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            className={inputClass}
+                            value={productoNuevo.precioCompra}
+                            onChange={(e) => setProductoNuevo({ ...productoNuevo, precioCompra: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <label className={labelClass}>Precio de venta ($)</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            className={inputClass}
+                            value={productoNuevo.precioVenta}
+                            onChange={(e) => setProductoNuevo({ ...productoNuevo, precioVenta: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <label className={labelClass}>Stock inicial</label>
+                          <input
+                            type="number"
+                            className={inputClass}
+                            value={productoNuevo.stock}
+                            onChange={(e) => setProductoNuevo({ ...productoNuevo, stock: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <button type="button" onClick={handleCrearProductoRapido} className={btnPrimarySmall}>
+                          Guardar y usar
+                        </button>
+                        <button type="button" onClick={() => setProductoNuevoOpen(false)} className={btnGhost}>
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      <SearchSelect
+                        placeholder="Escribe el nombre del producto..."
+                        onSearch={listProductos}
+                        renderItem={(p) => (
+                          <>
+                            <p className="font-medium">{p.nombre}</p>
+                            <p className="text-xs text-slate-500">
+                              ${Number(p.precioVenta).toFixed(2)} · stock: {p.stock}
+                            </p>
+                          </>
+                        )}
+                        onSelect={setProductoSel}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setProductoNuevoOpen(true)}
+                        className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                      >
+                        <PlusIcon width={13} height={13} /> No existe, registrar producto nuevo
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-[100px_1fr_auto] items-end gap-3">
+                  <div>
+                    <label className={labelClass}>Cantidad</label>
+                    <input
+                      type="number"
+                      min={1}
+                      className={inputClass}
+                      value={cantidad}
+                      onChange={(e) => setCantidad(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Importe de esta linea</label>
+                    <p className={`${inputClass} bg-slate-50 text-slate-500`}>
+                      {productoSel
+                        ? `$${(Number(productoSel.precioVenta) * Number(cantidad || 0)).toFixed(2)}`
+                        : 'Selecciona un producto...'}
+                    </p>
+                  </div>
+                  <button type="submit" className={`${btnPrimary} h-[38px]`}>
+                    Agregar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <label className={labelClass}>Descripcion del trabajo o servicio</label>
+                  <input
+                    className={inputClass}
+                    placeholder="Ej. Mano de obra - diagnostico electrico"
+                    value={descripcionLibre}
+                    onChange={(e) => setDescripcionLibre(e.target.value)}
+                  />
+                </div>
+                <div className="grid grid-cols-[160px_auto] items-end gap-3">
+                  <div>
+                    <label className={labelClass}>Costo ($)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      className={inputClass}
+                      placeholder="0.00"
+                      value={costoLibre}
+                      onChange={(e) => setCostoLibre(e.target.value)}
+                    />
+                  </div>
+                  <button type="submit" className={`${btnPrimary} h-[38px]`}>
+                    Agregar
+                  </button>
+                </div>
+                <p className="text-xs text-slate-400">
+                  ¿Otro servicio o pieza adicional? Agrega otra linea aparte, cada una con su propio costo.
+                </p>
+              </div>
+            )}
+            {errorItem && <p className="text-sm text-red-600">{errorItem}</p>}
+          </form>
+        </section>
+
+        {/* Garantias */}
+        {orden.fechaEntregaReal && (
+          <section className={`${cardClass} space-y-4 lg:col-span-2`}>
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-slate-800">Garantias de esta orden</h2>
+              {puedeAbrirGarantia && (
+                <button
+                  type="button"
+                  onClick={handleAbrirGarantia}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-amber-700"
+                >
+                  <PlusIcon width={15} height={15} /> El cliente regreso por garantia
+                </button>
+              )}
+            </div>
+
+            {orden.GarantiaEventos?.length > 0 ? (
+              <>
+                <div className="rounded-lg bg-slate-50 p-3">
+                  <p className="mb-1 text-xs text-slate-400">Diagnostico original (primera visita):</p>
+                  <p className="text-sm text-slate-600">{orden.diagnostico || 'Sin diagnostico registrado.'}</p>
+                </div>
+                <div className="space-y-4">
+                  {orden.GarantiaEventos.map((evento, idx) => (
+                    <GarantiaEventoCard
+                      key={evento.id}
+                      ordenId={id}
+                      evento={evento}
+                      numero={idx + 1}
+                      onChange={cargar}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p className="text-sm text-slate-400">Esta moto no ha regresado por garantia.</p>
+            )}
+          </section>
+        )}
+      </div>
     </div>
   );
 }

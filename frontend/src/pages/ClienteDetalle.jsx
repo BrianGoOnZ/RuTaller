@@ -3,9 +3,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getCliente } from '../services/clientes';
 import { createMoto, TIPOS_MOTO } from '../services/motos';
 import Modal from '../components/Modal';
-
-const inputClass = 'w-full border border-slate-300 rounded-md px-3 py-2 text-sm';
-const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
+import { inputClass, labelClass, btnPrimary } from '../ui/styles';
+import { PlusIcon } from '../ui/icons';
 
 const VACIO = { marca: '', modelo: '', tipo: '', placas: '', noSerie: '' };
 
@@ -37,32 +36,29 @@ export default function ClienteDetalle() {
 
   return (
     <div>
-      <Link to="/clientes" className="text-sm text-slate-500 hover:underline">
+      <Link to="/clientes" className="text-sm text-slate-500 hover:text-slate-700">
         &larr; Clientes
       </Link>
 
-      <div className="flex items-center justify-between mt-2 mb-6">
+      <div className="mt-2 mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">{cliente.nombre}</h1>
-          <p className="text-slate-500 text-sm">
+          <p className="text-sm text-slate-500">
             {cliente.telefono} {cliente.direccion ? `· ${cliente.direccion}` : ''}
           </p>
         </div>
-        <button
-          onClick={() => setModalOpen(true)}
-          className="bg-slate-900 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-slate-800"
-        >
-          + Agregar moto
+        <button onClick={() => setModalOpen(true)} className={`${btnPrimary} inline-flex items-center gap-1.5`}>
+          <PlusIcon width={16} height={16} /> Agregar moto
         </button>
       </div>
 
-      <h2 className="text-lg font-semibold text-slate-700 mb-3">Motos</h2>
+      <h2 className="mb-3 text-lg font-semibold text-slate-700">Motos</h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {cliente.Motos?.map((moto) => (
           <button
             key={moto.id}
             onClick={() => navigate(`/motos/${moto.id}`)}
-            className="text-left bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition"
+            className="rounded-xl bg-white p-4 text-left shadow-sm ring-1 ring-slate-100 transition-all hover:-translate-y-0.5 hover:shadow-md"
           >
             <p className="font-semibold text-slate-800">
               {moto.marca} {moto.modelo}
@@ -72,7 +68,7 @@ export default function ClienteDetalle() {
           </button>
         ))}
         {(!cliente.Motos || cliente.Motos.length === 0) && (
-          <p className="text-slate-400 text-sm">Este cliente aun no tiene motos registradas.</p>
+          <p className="text-sm text-slate-400">Este cliente aun no tiene motos registradas.</p>
         )}
       </div>
 
@@ -131,10 +127,7 @@ export default function ClienteDetalle() {
               />
             </div>
           </div>
-          <button
-            type="submit"
-            className="w-full bg-slate-900 text-white rounded-md py-2 text-sm font-medium hover:bg-slate-800"
-          >
+          <button type="submit" className={`${btnPrimary} w-full`}>
             Guardar
           </button>
         </form>

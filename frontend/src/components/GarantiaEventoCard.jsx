@@ -8,9 +8,8 @@ import { listProductos } from '../services/productos';
 import SearchSelect from './SearchSelect';
 import EstadoAutoGuardado from './EstadoAutoGuardado';
 import useAutoSaveTexto from '../hooks/useAutoSaveTexto';
-
-const inputClass = 'w-full border border-slate-300 rounded-md px-3 py-2 text-sm';
-const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
+import { TrashIcon } from '../ui/icons';
+import { inputClass, labelClass, btnPrimarySmall } from '../ui/styles';
 
 export default function GarantiaEventoCard({ ordenId, evento, numero, onChange }) {
   const diagnosticoAuto = useAutoSaveTexto(
@@ -85,15 +84,15 @@ export default function GarantiaEventoCard({ ordenId, evento, numero, onChange }
   }
 
   return (
-    <div className="border border-amber-200 bg-amber-50/40 rounded-lg p-4 space-y-4">
+    <div className="space-y-4 rounded-xl border border-amber-200 bg-amber-50/40 p-4">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-slate-700">Garantia #{numero}</h3>
+        <h3 className="font-semibold text-slate-800">Garantia #{numero}</h3>
         <span className="text-xs text-slate-500">Reingreso: {evento.fechaReingreso}</span>
       </div>
 
       {/* Diagnostico */}
       <div>
-        <div className="flex items-center justify-between mb-1">
+        <div className="mb-1 flex items-center justify-between">
           <label className={labelClass}>Diagnostico de esta visita</label>
           <EstadoAutoGuardado estado={diagnosticoAuto.estadoGuardado} />
         </div>
@@ -109,20 +108,20 @@ export default function GarantiaEventoCard({ ordenId, evento, numero, onChange }
       <div>
         <p className={labelClass}>Presupuesto de esta garantia</p>
         {evento.OrdenServicioItems?.length > 0 && (
-          <table className="w-full text-sm mb-2">
-            <tbody>
+          <table className="mb-2 w-full text-sm">
+            <tbody className="divide-y divide-amber-100">
               {evento.OrdenServicioItems.map((item) => (
-                <tr key={item.id} className="border-t border-amber-200">
-                  <td className="py-1">{item.descripcion}</td>
-                  <td className="py-1">{item.cantidad}</td>
-                  <td className="py-1">${Number(item.importe).toFixed(2)}</td>
-                  <td className="py-1 text-right">
+                <tr key={item.id}>
+                  <td className="py-1.5 text-slate-700">{item.descripcion}</td>
+                  <td className="py-1.5 text-slate-600">{item.cantidad}</td>
+                  <td className="py-1.5 text-slate-600">${Number(item.importe).toFixed(2)}</td>
+                  <td className="py-1.5 text-right">
                     <button
                       type="button"
-                      className="text-red-500 text-xs"
+                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-50 hover:text-red-700"
                       onClick={() => handleEliminarItem(item.id)}
                     >
-                      Quitar
+                      <TrashIcon width={13} height={13} /> Quitar
                     </button>
                   </td>
                 </tr>
@@ -130,38 +129,38 @@ export default function GarantiaEventoCard({ ordenId, evento, numero, onChange }
             </tbody>
           </table>
         )}
-        <div className="flex justify-between text-sm font-medium text-slate-700 mb-2">
+        <div className="mb-2 flex justify-between text-sm font-medium text-slate-700">
           <span>Subtotal + IVA de esta garantia</span>
           <span>${Number(evento.total).toFixed(2)}</span>
         </div>
 
         {!evento.fechaEntrega && (
-          <form onSubmit={handleAgregarItem} className="space-y-2 bg-white rounded-md p-3">
+          <form onSubmit={handleAgregarItem} className="space-y-2 rounded-lg bg-white p-3">
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setTipoItem('producto')}
-                className={`px-2 py-1 text-xs rounded-md border ${tipoItem === 'producto' ? 'bg-slate-900 text-white border-slate-900' : 'border-slate-300 text-slate-600'}`}
+                className={`rounded-lg border px-2 py-1 text-xs font-medium transition-colors ${tipoItem === 'producto' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}
               >
                 Producto
               </button>
               <button
                 type="button"
                 onClick={() => setTipoItem('mano_obra')}
-                className={`px-2 py-1 text-xs rounded-md border ${tipoItem === 'mano_obra' ? 'bg-slate-900 text-white border-slate-900' : 'border-slate-300 text-slate-600'}`}
+                className={`rounded-lg border px-2 py-1 text-xs font-medium transition-colors ${tipoItem === 'mano_obra' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}
               >
                 Mano de obra / libre
               </button>
             </div>
 
             {tipoItem === 'producto' ? (
-              <div className="grid grid-cols-[1fr_80px_auto] gap-2 items-end">
+              <div className="grid grid-cols-[1fr_80px_auto] items-end gap-2">
                 <div>
                   <label className={labelClass}>Producto</label>
                   {productoSel ? (
-                    <div className="flex items-center justify-between bg-slate-50 rounded-md px-2 py-1.5 text-sm">
+                    <div className="flex items-center justify-between rounded-lg bg-slate-50 px-2 py-1.5 text-sm">
                       <span>{productoSel.nombre}</span>
-                      <button type="button" className="text-slate-500 text-xs" onClick={() => setProductoSel(null)}>
+                      <button type="button" className="text-xs text-slate-500 hover:text-slate-700" onClick={() => setProductoSel(null)}>
                         Cambiar
                       </button>
                     </div>
@@ -191,15 +190,12 @@ export default function GarantiaEventoCard({ ordenId, evento, numero, onChange }
                     onChange={(e) => setCantidad(e.target.value)}
                   />
                 </div>
-                <button
-                  type="submit"
-                  className="bg-slate-900 text-white rounded-md px-3 py-2 text-sm font-medium h-[38px]"
-                >
+                <button type="submit" className={`${btnPrimarySmall} h-[38px]`}>
                   Agregar
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-[1fr_120px_auto] gap-2 items-end">
+              <div className="grid grid-cols-[1fr_120px_auto] items-end gap-2">
                 <div>
                   <label className={labelClass}>Descripcion</label>
                   <input
@@ -219,10 +215,7 @@ export default function GarantiaEventoCard({ ordenId, evento, numero, onChange }
                     onChange={(e) => setCostoLibre(e.target.value)}
                   />
                 </div>
-                <button
-                  type="submit"
-                  className="bg-slate-900 text-white rounded-md px-3 py-2 text-sm font-medium h-[38px]"
-                >
+                <button type="submit" className={`${btnPrimarySmall} h-[38px]`}>
                   Agregar
                 </button>
               </div>
@@ -241,7 +234,7 @@ export default function GarantiaEventoCard({ ordenId, evento, numero, onChange }
             {evento.firmaClienteEntrega ? 'Si' : 'No'}.
           </p>
         ) : (
-          <div className="bg-white rounded-md p-3 space-y-2">
+          <div className="space-y-2 rounded-lg bg-white p-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className={labelClass}>Fecha de entrega</label>
@@ -252,11 +245,12 @@ export default function GarantiaEventoCard({ ordenId, evento, numero, onChange }
                   onChange={(e) => setFechaEntrega(e.target.value)}
                 />
               </div>
-              <label className="flex items-center gap-2 mt-6 text-sm text-slate-700">
+              <label className="mt-6 flex items-center gap-2 text-sm text-slate-700">
                 <input
                   type="checkbox"
                   checked={firmaClienteEntrega}
                   onChange={(e) => setFirmaClienteEntrega(e.target.checked)}
+                  className="h-4 w-4 rounded border-slate-300"
                 />
                 Firmo de conformidad
               </label>
@@ -266,7 +260,7 @@ export default function GarantiaEventoCard({ ordenId, evento, numero, onChange }
               type="button"
               onClick={guardarEntrega}
               disabled={guardandoEntrega}
-              className="bg-green-700 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-green-800 disabled:opacity-50"
+              className="rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-green-800 disabled:opacity-50"
             >
               {guardandoEntrega ? 'Guardando...' : 'Marcar como entregada'}
             </button>

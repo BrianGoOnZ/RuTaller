@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getMoto } from '../services/motos';
+import {
+  tableWrapClass,
+  theadRowClass,
+  tbodyClass,
+  rowHoverClass,
+  badgePill,
+  ESTADO_BADGE_COLORS,
+} from '../ui/styles';
 
 const ESTADO_LABELS = {
   recibida: 'Recibida',
@@ -8,6 +16,7 @@ const ESTADO_LABELS = {
   reparacion: 'En reparacion',
   lista: 'Lista para entrega',
   entregada: 'Entregada',
+  garantia: 'Reabierta por garantia',
   cancelada: 'Cancelada',
 };
 
@@ -24,7 +33,7 @@ export default function MotoDetalle() {
 
   return (
     <div>
-      <Link to={`/clientes/${moto.clienteId}`} className="text-sm text-slate-500 hover:underline">
+      <Link to={`/clientes/${moto.clienteId}`} className="text-sm text-slate-500 hover:text-slate-700">
         &larr; {moto.Cliente?.nombre}
       </Link>
 
@@ -32,40 +41,44 @@ export default function MotoDetalle() {
         <h1 className="text-2xl font-bold text-slate-800">
           {moto.marca} {moto.modelo}
         </h1>
-        <p className="text-slate-500 text-sm">
+        <p className="text-sm text-slate-500">
           {moto.tipo} · Placas: {moto.placas || 'N/A'} · No. serie: {moto.noSerie || 'N/A'}
         </p>
       </div>
 
-      <h2 className="text-lg font-semibold text-slate-700 mb-3">Historial de servicios</h2>
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <h2 className="mb-3 text-lg font-semibold text-slate-700">Historial de servicios</h2>
+      <div className={tableWrapClass}>
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-slate-500 text-left">
-            <tr>
-              <th className="px-4 py-2">Folio</th>
-              <th className="px-4 py-2">Fecha ingreso</th>
-              <th className="px-4 py-2">Trabajo solicitado</th>
-              <th className="px-4 py-2">Estado</th>
-              <th className="px-4 py-2">Total</th>
+          <thead>
+            <tr className={theadRowClass}>
+              <th className="px-5 py-3">Folio</th>
+              <th className="px-5 py-3">Fecha ingreso</th>
+              <th className="px-5 py-3">Trabajo solicitado</th>
+              <th className="px-5 py-3">Estado</th>
+              <th className="px-5 py-3">Total</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className={tbodyClass}>
             {moto.OrdenServicios?.map((orden) => (
               <tr
                 key={orden.id}
-                className="border-t border-slate-100 hover:bg-slate-50 cursor-pointer"
+                className={`${rowHoverClass} cursor-pointer`}
                 onClick={() => navigate(`/servicios/${orden.id}`)}
               >
-                <td className="px-4 py-2 font-medium">#{orden.id}</td>
-                <td className="px-4 py-2">{orden.fechaIngreso}</td>
-                <td className="px-4 py-2">{orden.trabajoSolicitado}</td>
-                <td className="px-4 py-2">{ESTADO_LABELS[orden.estado]}</td>
-                <td className="px-4 py-2">${Number(orden.total).toFixed(2)}</td>
+                <td className="px-5 py-3 font-medium text-slate-800">#{orden.id}</td>
+                <td className="px-5 py-3 text-slate-600">{orden.fechaIngreso}</td>
+                <td className="px-5 py-3 text-slate-600">{orden.trabajoSolicitado}</td>
+                <td className="px-5 py-3">
+                  <span className={`${badgePill} ${ESTADO_BADGE_COLORS[orden.estado]}`}>
+                    {ESTADO_LABELS[orden.estado]}
+                  </span>
+                </td>
+                <td className="px-5 py-3 text-slate-600">${Number(orden.total).toFixed(2)}</td>
               </tr>
             ))}
             {(!moto.OrdenServicios || moto.OrdenServicios.length === 0) && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-slate-400">
+                <td colSpan={5} className="px-5 py-8 text-center text-slate-400">
                   Esta moto aun no tiene servicios registrados
                 </td>
               </tr>

@@ -3,9 +3,18 @@ import { listGastos, createGasto, CATEGORIAS_GASTO } from '../services/gastos';
 import { getFinanzasResumen } from '../services/reportes';
 import { listInsumos } from '../services/insumos';
 import Modal from '../components/Modal';
-
-const inputClass = 'w-full border border-slate-300 rounded-md px-3 py-2 text-sm';
-const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
+import { PlusIcon, CashIcon, ClipboardIcon, ReceiptIcon, ScaleIcon } from '../ui/icons';
+import {
+  inputClass,
+  labelClass,
+  tableWrapClass,
+  theadRowClass,
+  tbodyClass,
+  rowHoverClass,
+  btnPrimary,
+  statCardClass,
+  statIconWrapClass,
+} from '../ui/styles';
 
 function primerDiaDelMes() {
   const d = new Date();
@@ -64,15 +73,12 @@ export default function Finanzas() {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold text-slate-800">Finanzas</h1>
-        <button
-          onClick={abrirNuevo}
-          className="bg-slate-900 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-slate-800"
-        >
-          + Registrar gasto
+        <button onClick={abrirNuevo} className={`${btnPrimary} inline-flex items-center gap-1.5`}>
+          <PlusIcon width={16} height={16} /> Registrar gasto
         </button>
       </div>
 
-      <div className="flex gap-3 mb-4 items-end">
+      <div className="flex items-end gap-3 mb-5">
         <div>
           <label className={labelClass}>Desde</label>
           <input type="date" className={inputClass} value={desde} onChange={(e) => setDesde(e.target.value)} />
@@ -84,54 +90,74 @@ export default function Finanzas() {
       </div>
 
       {resumen && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <p className="text-xs text-slate-400">Ventas de mostrador</p>
-            <p className="text-xl font-bold text-slate-800">${resumen.ingresosVentas.toFixed(2)}</p>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+          <div className={statCardClass}>
+            <div className={statIconWrapClass('blue')}>
+              <CashIcon width={20} height={20} />
+            </div>
+            <div>
+              <p className="text-xs text-slate-400">Ventas de mostrador</p>
+              <p className="text-xl font-bold text-slate-800">${resumen.ingresosVentas.toFixed(2)}</p>
+            </div>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <p className="text-xs text-slate-400">Servicios entregados</p>
-            <p className="text-xl font-bold text-slate-800">${resumen.ingresosServicios.toFixed(2)}</p>
+          <div className={statCardClass}>
+            <div className={statIconWrapClass('slate')}>
+              <ClipboardIcon width={20} height={20} />
+            </div>
+            <div>
+              <p className="text-xs text-slate-400">Servicios entregados</p>
+              <p className="text-xl font-bold text-slate-800">${resumen.ingresosServicios.toFixed(2)}</p>
+            </div>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <p className="text-xs text-slate-400">Gastos</p>
-            <p className="text-xl font-bold text-red-600">${resumen.totalGastos.toFixed(2)}</p>
+          <div className={statCardClass}>
+            <div className={statIconWrapClass('red')}>
+              <ReceiptIcon width={20} height={20} />
+            </div>
+            <div>
+              <p className="text-xs text-slate-400">Gastos</p>
+              <p className="text-xl font-bold text-red-600">${resumen.totalGastos.toFixed(2)}</p>
+            </div>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <p className="text-xs text-slate-400">Balance</p>
-            <p className={`text-xl font-bold ${resumen.balance >= 0 ? 'text-green-700' : 'text-red-600'}`}>
-              ${resumen.balance.toFixed(2)}
-            </p>
+          <div className={statCardClass}>
+            <div className={statIconWrapClass(resumen.balance >= 0 ? 'green' : 'red')}>
+              <ScaleIcon width={20} height={20} />
+            </div>
+            <div>
+              <p className="text-xs text-slate-400">Balance</p>
+              <p className={`text-xl font-bold ${resumen.balance >= 0 ? 'text-green-700' : 'text-red-600'}`}>
+                ${resumen.balance.toFixed(2)}
+              </p>
+            </div>
           </div>
         </div>
       )}
 
-      <h2 className="text-lg font-semibold text-slate-700 mb-3">Gastos del periodo</h2>
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <h2 className="mb-3 text-lg font-semibold text-slate-700">Gastos del periodo</h2>
+      <div className={tableWrapClass}>
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-slate-500 text-left">
-            <tr>
-              <th className="px-4 py-2">Fecha</th>
-              <th className="px-4 py-2">Concepto</th>
-              <th className="px-4 py-2">Categoria</th>
-              <th className="px-4 py-2">Monto</th>
+          <thead>
+            <tr className={theadRowClass}>
+              <th className="px-5 py-3">Fecha</th>
+              <th className="px-5 py-3">Concepto</th>
+              <th className="px-5 py-3">Categoria</th>
+              <th className="px-5 py-3">Monto</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className={tbodyClass}>
             {gastos.map((g) => (
-              <tr key={g.id} className="border-t border-slate-100">
-                <td className="px-4 py-2">{g.fecha}</td>
-                <td className="px-4 py-2">{g.concepto}</td>
-                <td className="px-4 py-2">
+              <tr key={g.id} className={rowHoverClass}>
+                <td className="px-5 py-3 text-slate-600">{g.fecha}</td>
+                <td className="px-5 py-3 text-slate-800">{g.concepto}</td>
+                <td className="px-5 py-3 text-slate-600">
                   {CATEGORIAS_GASTO.find((c) => c.value === g.categoria)?.label}
                   {g.Insumo && <span className="text-xs text-slate-400"> ({g.Insumo.nombre})</span>}
                 </td>
-                <td className="px-4 py-2">${Number(g.monto).toFixed(2)}</td>
+                <td className="px-5 py-3 text-slate-600">${Number(g.monto).toFixed(2)}</td>
               </tr>
             ))}
             {gastos.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-slate-400">
+                <td colSpan={4} className="px-5 py-8 text-center text-slate-400">
                   Sin gastos en este periodo
                 </td>
               </tr>
@@ -207,7 +233,7 @@ export default function Finanzas() {
               required
             />
           </div>
-          <button type="submit" className="w-full bg-slate-900 text-white rounded-md py-2 text-sm font-medium hover:bg-slate-800">
+          <button type="submit" className={`${btnPrimary} w-full`}>
             Guardar
           </button>
         </form>

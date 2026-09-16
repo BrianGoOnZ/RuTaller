@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { listProductos } from '../../services/productos';
 import { listVentas, createVenta } from '../../services/ventas';
 import SearchSelect from '../SearchSelect';
-
-const inputClass = 'w-full border border-slate-300 rounded-md px-3 py-2 text-sm';
+import { TrashIcon } from '../../ui/icons';
+import { inputClass, cardClass, tbodyClass } from '../../ui/styles';
 
 export default function VentaRapidaTab() {
   const [carrito, setCarrito] = useState([]);
@@ -59,9 +59,9 @@ export default function VentaRapidaTab() {
   }
 
   return (
-    <div className="grid lg:grid-cols-2 gap-6">
-      <div className="bg-white rounded-lg shadow-sm p-5 space-y-4">
-        <h2 className="font-semibold text-slate-700">Venta de mostrador</h2>
+    <div className="grid gap-6 lg:grid-cols-2">
+      <div className={`${cardClass} space-y-4`}>
+        <h2 className="font-semibold text-slate-800">Venta de mostrador</h2>
         <SearchSelect
           placeholder="Buscar producto para agregar..."
           onSearch={listProductos}
@@ -77,11 +77,11 @@ export default function VentaRapidaTab() {
         />
 
         <table className="w-full text-sm">
-          <tbody>
+          <tbody className={tbodyClass}>
             {carrito.map((i) => (
-              <tr key={i.producto.id} className="border-t border-slate-100">
-                <td className="py-2">{i.producto.nombre}</td>
-                <td className="py-2 w-20">
+              <tr key={i.producto.id}>
+                <td className="py-2 text-slate-700">{i.producto.nombre}</td>
+                <td className="w-20 py-2">
                   <input
                     type="number"
                     min={1}
@@ -91,12 +91,15 @@ export default function VentaRapidaTab() {
                     onChange={(e) => actualizarCantidad(i.producto.id, Number(e.target.value))}
                   />
                 </td>
-                <td className="py-2 text-right">
+                <td className="py-2 text-right text-slate-700">
                   ${(Number(i.producto.precioVenta) * i.cantidad).toFixed(2)}
                 </td>
                 <td className="py-2 text-right">
-                  <button className="text-red-500 text-xs" onClick={() => quitar(i.producto.id)}>
-                    Quitar
+                  <button
+                    className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-50 hover:text-red-700"
+                    onClick={() => quitar(i.producto.id)}
+                  >
+                    <TrashIcon width={14} height={14} /> Quitar
                   </button>
                 </td>
               </tr>
@@ -111,7 +114,7 @@ export default function VentaRapidaTab() {
           </tbody>
         </table>
 
-        <div className="flex justify-between font-semibold text-slate-800 border-t border-slate-200 pt-3">
+        <div className="flex justify-between border-t border-slate-100 pt-3 font-semibold text-slate-800">
           <span>Subtotal</span>
           <span>${subtotal.toFixed(2)}</span>
         </div>
@@ -122,28 +125,28 @@ export default function VentaRapidaTab() {
         <button
           onClick={cobrar}
           disabled={carrito.length === 0}
-          className="w-full bg-green-700 text-white rounded-md py-2 text-sm font-medium hover:bg-green-800 disabled:opacity-50"
+          className="w-full rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-green-800 disabled:opacity-50"
         >
           Cobrar
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-5">
-        <h2 className="font-semibold text-slate-700 mb-3">Ventas recientes</h2>
+      <div className={cardClass}>
+        <h2 className="mb-3 font-semibold text-slate-800">Ventas recientes</h2>
         <table className="w-full text-sm">
-          <thead className="text-slate-500 text-left">
+          <thead className="text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
             <tr>
-              <th className="py-1">Fecha</th>
-              <th className="py-1">Productos</th>
-              <th className="py-1">Total</th>
+              <th className="py-1.5">Fecha</th>
+              <th className="py-1.5">Productos</th>
+              <th className="py-1.5">Total</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className={tbodyClass}>
             {ventas.slice(0, 10).map((v) => (
-              <tr key={v.id} className="border-t border-slate-100">
-                <td className="py-2">{v.fecha}</td>
-                <td className="py-2">{v.VentaItems?.length} producto(s)</td>
-                <td className="py-2">${Number(v.total).toFixed(2)}</td>
+              <tr key={v.id}>
+                <td className="py-2 text-slate-600">{v.fecha}</td>
+                <td className="py-2 text-slate-600">{v.VentaItems?.length} producto(s)</td>
+                <td className="py-2 text-slate-600">${Number(v.total).toFixed(2)}</td>
               </tr>
             ))}
             {ventas.length === 0 && (

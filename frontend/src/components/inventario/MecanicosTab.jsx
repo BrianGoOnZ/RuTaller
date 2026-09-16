@@ -7,9 +7,20 @@ import {
   ESPECIALIDADES_MECANICO,
 } from '../../services/mecanicos';
 import Modal from '../Modal';
-
-const inputClass = 'w-full border border-slate-300 rounded-md px-3 py-2 text-sm';
-const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
+import { PencilIcon, TrashIcon, PlusIcon } from '../../ui/icons';
+import {
+  inputClass,
+  labelClass,
+  tableWrapClass,
+  theadRowClass,
+  tbodyClass,
+  rowHoverClass,
+  btnPrimary,
+  actionBtnNeutral,
+  actionBtnDanger,
+  avatarInitial,
+  avatarClass,
+} from '../../ui/styles';
 
 const VACIO = { nombre: '', telefono: '', especialidad: '', fechaIngreso: '' };
 
@@ -64,45 +75,49 @@ export default function MecanicosTab() {
         <p className="text-sm text-slate-500">
           Catalogo de mecanicos del taller. Se usan para registrar quien consume cada insumo.
         </p>
-        <button
-          onClick={abrirNuevo}
-          className="bg-slate-900 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-slate-800"
-        >
-          + Nuevo mecanico
+        <button onClick={abrirNuevo} className={`${btnPrimary} inline-flex items-center gap-1.5`}>
+          <PlusIcon width={16} height={16} /> Nuevo mecanico
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className={tableWrapClass}>
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-slate-500 text-left">
-            <tr>
-              <th className="px-4 py-2">Nombre</th>
-              <th className="px-4 py-2">Telefono</th>
-              <th className="px-4 py-2">Especialidad</th>
-              <th className="px-4 py-2">Fecha de ingreso</th>
-              <th className="px-4 py-2"></th>
+          <thead>
+            <tr className={theadRowClass}>
+              <th className="px-5 py-3">Mecanico</th>
+              <th className="px-5 py-3">Telefono</th>
+              <th className="px-5 py-3">Especialidad</th>
+              <th className="px-5 py-3">Fecha de ingreso</th>
+              <th className="px-5 py-3 text-right">Acciones</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className={tbodyClass}>
             {mecanicos.map((m) => (
-              <tr key={m.id} className="border-t border-slate-100 hover:bg-slate-50">
-                <td className="px-4 py-2 font-medium">{m.nombre}</td>
-                <td className="px-4 py-2">{m.telefono || '-'}</td>
-                <td className="px-4 py-2">{m.especialidad || '-'}</td>
-                <td className="px-4 py-2">{m.fechaIngreso || '-'}</td>
-                <td className="px-4 py-2 text-right space-x-3">
-                  <button className="text-slate-500 hover:text-slate-800" onClick={() => abrirEditar(m)}>
-                    Editar
-                  </button>
-                  <button className="text-red-500 hover:text-red-700" onClick={() => handleDelete(m)}>
-                    Dar de baja
-                  </button>
+              <tr key={m.id} className={rowHoverClass}>
+                <td className="px-5 py-3">
+                  <div className="flex items-center gap-3">
+                    <div className={avatarClass}>{avatarInitial(m.nombre)}</div>
+                    <span className="font-medium text-slate-800">{m.nombre}</span>
+                  </div>
+                </td>
+                <td className="px-5 py-3 text-slate-600">{m.telefono || '-'}</td>
+                <td className="px-5 py-3 text-slate-600">{m.especialidad || '-'}</td>
+                <td className="px-5 py-3 text-slate-600">{m.fechaIngreso || '-'}</td>
+                <td className="px-5 py-3">
+                  <div className="flex items-center justify-end gap-2">
+                    <button onClick={() => abrirEditar(m)} className={actionBtnNeutral}>
+                      <PencilIcon /> Editar
+                    </button>
+                    <button onClick={() => handleDelete(m)} className={actionBtnDanger}>
+                      <TrashIcon /> Dar de baja
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
             {mecanicos.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-slate-400">
+                <td colSpan={5} className="px-5 py-8 text-center text-slate-400">
                   Sin mecanicos registrados
                 </td>
               </tr>
@@ -160,10 +175,7 @@ export default function MecanicosTab() {
               ))}
             </select>
           </div>
-          <button
-            type="submit"
-            className="w-full bg-slate-900 text-white rounded-md py-2 text-sm font-medium hover:bg-slate-800"
-          >
+          <button type="submit" className={`${btnPrimary} w-full`}>
             Guardar
           </button>
         </form>
